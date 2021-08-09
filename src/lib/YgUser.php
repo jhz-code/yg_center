@@ -11,6 +11,12 @@ use Yg\YgCenter\funcs\YgFunction;
 use Yg\YgCenter\model\UserLoginModel;
 use Yg\YgCenter\model\UserSourceModel;
 
+
+/**
+ * 用户数据操作
+ * Class YgUser
+ * @package Yg\YgCenter\lib
+ */
 class YgUser
 {
 
