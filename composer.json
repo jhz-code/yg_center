@@ -1,0 +1,18 @@
+{
+    "name": "yg/yg_center",
+    "description": "yg_center",
+    "authors": [
+        {
+            "name": "zjh",
+            "email": "zhuok520@qq.com"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "Yg\\YgCenter\\": "src/"
+        }
+    },
+    "require": {
+        "topthink/think-migration": "^3.0"
+    }
+}
