@@ -147,7 +147,7 @@ class WxLogin
      * 封装请求方法
      */
 
-    public static function HttpRequest($url, array $param, string $method = 'get', array $header = []): bool|string
+    public static function HttpRequest($url, array $param, string $method = 'get', array $header = [])
     {
         if ($method === "get" && !empty($param)) {
             $url = $url . http_build_query($param);
