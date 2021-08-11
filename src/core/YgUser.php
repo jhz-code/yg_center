@@ -50,12 +50,13 @@ class YgUser
                 ->field('nickname,headimgurl,sex,truename,auth_id,level,isblack,ispass,password')
                 ->find();
             if($UserInfo){
+                $this->userLoginUpdate($find['id']);
                 return $UserInfo->toArray();
             }else{
                 return [];
             }
         }else{
-            return  '';
+            return  "密码错误";
         }
     }
 
@@ -71,6 +72,7 @@ class YgUser
             $UserInfo = $wxPlatform->getUserInfo($result['openid'], $result['access_token']);
             $res = UserSourceModel::where(['wxopenid'=>$UserInfo['wxopenid'],'from'=>$from])->find();
             if($res){
+                //返回用户信息
                 return  $res[1];
             }else{
                 return  [];
@@ -110,6 +112,14 @@ class YgUser
     }
 
 
+    /**
+     * 用户登录日志更新
+     * @param int $id
+     *
+     */
+    function userLoginUpdate(int $id){
+        UserLoginModel::where(['id'=>$id])->update(['login_time'=>time(),'login_ip'=>YgFunction::getClientIP()]);//记录用户登录时间
+    }
 
 
 
