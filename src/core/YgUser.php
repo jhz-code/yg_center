@@ -101,11 +101,11 @@ class YgUser
      */
     function create_use_source(string $from,array $data)
     {
-        if(!UserLoginModel::where("userphone = '{$data['account']}' or email = '{$data['account']}' ")->find()){
+        if(!UserLoginModel::where("userphone = '{$data['account']}' or email = '{$data['account']}' ")->where(['from'=>$from])->find()){
             $data['from'] = $from;
             return UserSourceModel::create($data);
         }else{
-            return false;
+            return "用户已存在";
         }
     }
 
