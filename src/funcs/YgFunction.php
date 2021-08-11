@@ -24,7 +24,7 @@ class YgFunction
      * @param string $password
      * @return false|string
      */
-    static function YgMd5String(string $key,string $password): bool|string
+    static function YgMd5String(string $key,string $password)
     {
         return  substr(md5($key.md5($password)),8,16);
     }
