@@ -1,12 +1,13 @@
 <?php
 
 
-namespace Yg\YgCenter\lib;
+namespace Yg\YgCenter\core;
 
 
 use think\db\exception\DataNotFoundException;
 use think\db\exception\DbException;
 use think\db\exception\ModelNotFoundException;
+use think\Model;
 use Yg\YgCenter\funcs\YgFunction;
 use Yg\YgCenter\model\UserLoginModel;
 use Yg\YgCenter\model\UserSourceModel;
@@ -30,7 +31,8 @@ class YgUser
      * @throws DbException
      * @throws ModelNotFoundException
      */
-    function Login($account,$password){
+    function Login($account,$password): array|string
+    {
         $find = UserLoginModel::where("userphone = '{$account}' or email = '{$account}' ")
             ->field('nickname,headimgurl,sex,truename,auth_id,level,isblack,ispass,password')->find();
         if($find && password_verify($password, $find['password'])) {
@@ -47,15 +49,35 @@ class YgUser
 
 
     /**
+     * 通过微信登录
+     */
+    function LoginByWx(){
+
+    }
+
+
+    /**
+     * 通过短信登录系统
+     */
+    function LoginBySms(){
+
+    }
+
+
+
+
+
+    /**
      * 创建用户资源
      * @param string $from
      * @param array $data
-     * @return false|\think\Model|UserSourceModel
+     * @return false|Model|UserSourceModel
      * @throws DataNotFoundException
      * @throws DbException
      * @throws ModelNotFoundException
      */
-    function create_use_source(string $from,array $data){
+    function create_use_source(string $from,array $data): bool|UserSourceModel|Model
+    {
         if(!UserLoginModel::where("userphone = '{$data['account']}' or email = '{$data['account']}' ")->find()){
             $data['from'] = $from;
             return UserSourceModel::create($data);
@@ -63,6 +85,11 @@ class YgUser
             return false;
         }
     }
+
+
+
+
+
 
 
 

@@ -13,7 +13,9 @@
         }
     },
     "require": {
-        "topthink/think-migration": "^3.0"
+        "topthink/think-migration": "^3.0",
+        "endroid/qr-code": "^4.2.1",
+        "ext-curl": "*"
     }
 }
 
