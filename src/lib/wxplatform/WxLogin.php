@@ -1,5 +1,8 @@
 <?php
 
+
+namespace Yg\YgCenter\lib\wxplatform;
+
 use think\Exception;
 use think\facade\Cache;
 use Yg\YgCenter\funcs\YgFunction;
@@ -115,7 +118,7 @@ class WxLogin
      * @return mixed
      * @throws Exception
      */
-    public static function getUserInfo(string $openId, string $token): mixed
+    public  function getUserInfo(string $openId, string $token): mixed
     {
         $url = "https://api.weixin.qq.com/sns/userinfo?";
         $param['access_token'] = $token;

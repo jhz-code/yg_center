@@ -9,6 +9,8 @@ use think\db\exception\DbException;
 use think\db\exception\ModelNotFoundException;
 use think\Model;
 use Yg\YgCenter\funcs\YgFunction;
+use Yg\YgCenter\lib\wxplatform\WxLogin;
+use Yg\YgCenter\lib\YgSession;
 use Yg\YgCenter\model\UserLoginModel;
 use Yg\YgCenter\model\UserSourceModel;
 
@@ -51,8 +53,31 @@ class YgUser
     /**
      * 通过微信登录
      */
-    function LoginByWx(){
-
+    function LoginByWx($appId,$appSecret): bool|array
+    {
+        if(!empty($code)){
+            $wxPlatform = new  WxLogin($appId,$appSecret);
+            $result = $wxPlatform->getAccessToken($code);
+            TODO: //code 换取基础授权token openid
+            $UserInfo = $wxPlatform->getUserInfo($result['openid'], $result['access_token']);
+            $res = UserSourceModel::where(['wxopenid'=>$UserInfo['wxopenid']])->find();
+            if($res){
+                //黑名单禁止登录
+                if(!$res[1]['isblack']){
+                  return false;
+                }
+//                UserSourceModel::loginLog($res[1]['id']);//更新登录状态
+                $successData["userInfo"] = $res[1]; //返回用户数据
+                $successData['token'] = YgSession::generate($res[1]['id']); //生成用户token
+                $successData["type"] = $res[0]; //返回用户登录类型
+                return $successData;
+            }else{
+                $successData["type"] = "reg"; //返回用户登录类型
+                return $successData;
+            }
+        }else{
+            return [];
+        }
     }
 
 
