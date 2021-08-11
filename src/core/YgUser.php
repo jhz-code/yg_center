@@ -28,23 +28,32 @@ class YgUser
      * 账户登录 并返回用户信息
      * @param $account
      * @param $password
+     * @param $from
      * @return array|string
      * @throws DataNotFoundException
      * @throws DbException
      * @throws ModelNotFoundException
      */
 
-    function Login($account,$password)
+    function Login($account,$password,$from)
     {
-        $find = UserLoginModel::where("userphone = '{$account}' or email = '{$account}' ")
-            ->field('nickname,headimgurl,sex,truename,auth_id,level,isblack,ispass,password')->find();
+        $find = UserLoginModel::where("userphone = '{$account}' or email = '{$account}' ")->find();
+        //用户登陆成功,检索系统用户
         if($find && password_verify($password, $find['password'])) {
             if(empty($find['md5password'])){
                 UserLoginModel::where(['id' => $find['id']])->update([
                     'md5password' => YgFunction::YgMd5String("ygxsj_.",$password)
                 ]);
             }
-            return $find->toArray();
+            //检索系统用户 , 返回关联用户数据
+            $UserInfo = UserSourceModel::where("userphone = '{$account}' or email = '{$account}' ")->where(['from'=>$from])
+                ->field('nickname,headimgurl,sex,truename,auth_id,level,isblack,ispass,password')
+                ->find();
+            if($UserInfo){
+                return $UserInfo->toArray();
+            }else{
+                return [];
+            }
         }else{
             return  '';
         }
@@ -54,27 +63,17 @@ class YgUser
     /**
      * 通过微信登录
      */
-    function LoginByWx($appId,$appSecret)
+    function LoginByWx($appId,$appSecret,$from)
     {
         if(!empty($code)){
             $wxPlatform = new  WxLogin($appId,$appSecret);
             $result = $wxPlatform->getAccessToken($code);
-            TODO: //code 换取基础授权token openid
             $UserInfo = $wxPlatform->getUserInfo($result['openid'], $result['access_token']);
-            $res = UserSourceModel::where(['wxopenid'=>$UserInfo['wxopenid']])->find();
+            $res = UserSourceModel::where(['wxopenid'=>$UserInfo['wxopenid'],'from'=>$from])->find();
             if($res){
-                //黑名单禁止登录
-                if(!$res[1]['isblack']){
-                  return false;
-                }
-//                UserSourceModel::loginLog($res[1]['id']);//更新登录状态
-                $successData["userInfo"] = $res[1]; //返回用户数据
-                $successData['token'] = YgSession::generate($res[1]['id']); //生成用户token
-                $successData["type"] = $res[0]; //返回用户登录类型
-                return $successData;
+                return  $res[1];
             }else{
-                $successData["type"] = "reg"; //返回用户登录类型
-                return $successData;
+                return  [];
             }
         }else{
             return [];
@@ -88,8 +87,6 @@ class YgUser
     function LoginBySms(){
 
     }
-
-
 
 
 
