@@ -10,8 +10,8 @@ use Yg\YgCenter\funcs\YgFunction;
 class WxLogin
 {
 
-    protected string $appId;
-    protected string $appSecret;
+    protected  $appId;
+    protected  $appSecret;
 
     public function __construct(string $appId,string $appSecret)
     {
@@ -53,7 +53,7 @@ class WxLogin
      * @param $code
      * @return mixed
      */
-     function getAccessToken($code): mixed
+     function getAccessToken($code)
     {
         $url = "https://api.weixin.qq.com/sns/oauth2/access_token?";
         $param['appid'] = $this->appId;
@@ -83,7 +83,7 @@ class WxLogin
      * 刷新token
      * @throws Exception
      */
-    public function reFreshToken(): mixed
+    public function reFreshToken()
     {
         if (!Cache::get("refresh_token")){
             return false;
@@ -118,7 +118,7 @@ class WxLogin
      * @return mixed
      * @throws Exception
      */
-    public  function getUserInfo(string $openId, string $token): mixed
+    public  function getUserInfo(string $openId, string $token)
     {
         $url = "https://api.weixin.qq.com/sns/userinfo?";
         $param['access_token'] = $token;

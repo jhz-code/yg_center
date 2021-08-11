@@ -33,7 +33,7 @@ class YgUser
      * @throws DbException
      * @throws ModelNotFoundException
      */
-    function Login($account,$password): array|string
+    function Login($account,$password)
     {
         $find = UserLoginModel::where("userphone = '{$account}' or email = '{$account}' ")
             ->field('nickname,headimgurl,sex,truename,auth_id,level,isblack,ispass,password')->find();
@@ -53,7 +53,7 @@ class YgUser
     /**
      * 通过微信登录
      */
-    function LoginByWx($appId,$appSecret): bool|array
+    function LoginByWx($appId,$appSecret)
     {
         if(!empty($code)){
             $wxPlatform = new  WxLogin($appId,$appSecret);
@@ -101,7 +101,7 @@ class YgUser
      * @throws DbException
      * @throws ModelNotFoundException
      */
-    function create_use_source(string $from,array $data): bool|UserSourceModel|Model
+    function create_use_source(string $from,array $data)
     {
         if(!UserLoginModel::where("userphone = '{$data['account']}' or email = '{$data['account']}' ")->find()){
             $data['from'] = $from;
