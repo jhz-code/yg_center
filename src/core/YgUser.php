@@ -9,6 +9,7 @@ use think\db\exception\ModelNotFoundException;
 use think\Model;
 use Yg\YgCenter\funcs\YgFunction;
 use Yg\YgCenter\lib\wxplatform\WxLogin;
+use Yg\YgCenter\lib\YgUserCheck;
 use Yg\YgCenter\model\UserLoginModel;
 use Yg\YgCenter\model\UserSourceModel;
 
@@ -85,19 +86,46 @@ class YgUser
      * 创建用户资源
      * @param string $from
      * @param array $data
-     * @return false|Model|UserSourceModel
+     * @return string|Model|UserSourceModel
      * @throws DataNotFoundException
      * @throws DbException
      * @throws ModelNotFoundException
      */
-    static function create_use_source(string $from,array $data)
+    static function create_user_source(string $from,array $data)
     {
         if(!UserLoginModel::where("userphone = '{$data['account']}' or email = '{$data['account']}' ")->where(['from'=>$from])->find()){
             $data['from'] = $from;
-            return UserSourceModel::create($data);
+            self::createUserLogin($data);
+            return UserSourceModel::create([
+                "create_time" => time(),
+                "update_time" => time(),
+                "equal_id" => $data['equal_id'],
+                "level" => $data['level'],
+                'userphone' => YgUserCheck::isEmail($data['email'])?$data['email']:"",
+                'email' =>  YgUserCheck::isPhone($data['userphone'])?$data['userphone']:"",
+                'useraccount'=>$data['account'],//用户账户
+            ]);
         }else{
             return "用户已存在";
         }
+    }
+
+
+    /**
+     * 创建用户登录信息
+     * @param array $data
+     * @throws DataNotFoundException
+     * @throws DbException
+     * @throws ModelNotFoundException
+     */
+    static function createUserLogin(array $data){
+       if(UserLoginModel::where("userphone = '{$data['account']}' or email = '{$data['account']}' ")->find())
+       $insert['email'] = YgUserCheck::isEmail($data['email'])?$data['email']:"";
+       $insert['userphone'] = YgUserCheck::isPhone($data['userphone'])?$data['userphone']:"";
+       $insert['password'] = password_hash($data['password'], PASSWORD_DEFAULT);
+       $insert['md5password'] = YgFunction::YgMd5String("ygxsj_.", $data['password']) ;
+       $insert['login_ip'] = YgFunction::getClientIP() ;
+       UserLoginModel::create($insert);
     }
 
 
