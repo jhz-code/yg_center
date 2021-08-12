@@ -3,14 +3,12 @@
 
 namespace Yg\YgCenter\core;
 
-
 use think\db\exception\DataNotFoundException;
 use think\db\exception\DbException;
 use think\db\exception\ModelNotFoundException;
 use think\Model;
 use Yg\YgCenter\funcs\YgFunction;
 use Yg\YgCenter\lib\wxplatform\WxLogin;
-use Yg\YgCenter\lib\YgSession;
 use Yg\YgCenter\model\UserLoginModel;
 use Yg\YgCenter\model\UserSourceModel;
 
@@ -35,7 +33,7 @@ class YgUser
      * @throws ModelNotFoundException
      */
 
-    function Login($account,$password,$from)
+   static   function Login($account,$password,$from)
     {
         $find = UserLoginModel::where("userphone = '{$account}' or email = '{$account}' ")->find();
         //用户登陆成功,检索系统用户
@@ -50,7 +48,7 @@ class YgUser
                 ->field('nickname,headimgurl,sex,truename,auth_id,level,isblack,ispass,password')
                 ->find();
             if($UserInfo){
-                $this->userLoginUpdate($find['id']);
+                self::userLoginUpdate($find['id']);
                 return $UserInfo->toArray();
             }else{
                 return [];
@@ -64,8 +62,8 @@ class YgUser
     /**
      * 通过微信登录
      */
-    function LoginByWx($appId,$appSecret,$from)
-    {
+     static   function LoginByWx($appId,$appSecret,$from)
+      {
         if(!empty($code)){
             $wxPlatform = new  WxLogin($appId,$appSecret);
             $result = $wxPlatform->getAccessToken($code);
@@ -84,15 +82,6 @@ class YgUser
 
 
     /**
-     * 通过短信登录系统
-     */
-    function LoginBySms(){
-
-    }
-
-
-
-    /**
      * 创建用户资源
      * @param string $from
      * @param array $data
@@ -101,7 +90,7 @@ class YgUser
      * @throws DbException
      * @throws ModelNotFoundException
      */
-    function create_use_source(string $from,array $data)
+    static function create_use_source(string $from,array $data)
     {
         if(!UserLoginModel::where("userphone = '{$data['account']}' or email = '{$data['account']}' ")->where(['from'=>$from])->find()){
             $data['from'] = $from;
@@ -117,13 +106,41 @@ class YgUser
      * @param int $id
      *
      */
-    function userLoginUpdate(int $id){
+   static  function userLoginUpdate(int $id){
         UserLoginModel::where(['id'=>$id])->update(['login_time'=>time(),'login_ip'=>YgFunction::getClientIP()]);//记录用户登录时间
     }
 
 
+    /**
+     * 通过手机号读取用户信息
+     * @param string $account
+     * @param string $from
+     * @return array|Model|UserSourceModel|null
+     * @throws DataNotFoundException
+     * @throws DbException
+     * @throws ModelNotFoundException
+     */
+    static function getUserInfoByAccount(string $account,string $from){
+       return  UserSourceModel::where("userphone = '{$account}' or email = '{$account}' ")->where(['from'=>$from])
+            ->field('nickname,headimgurl,sex,truename,auth_id,level,isblack,ispass,password')
+            ->find();
+    }
 
 
+    /**
+     * 输出用户资料
+     * @param int $uid
+     * @param string $from
+     * @return array|Model|UserSourceModel|null
+     * @throws DataNotFoundException
+     * @throws DbException
+     * @throws ModelNotFoundException
+     */
+    static function getUserInfoByUid(int $uid,string $from){
+        return  UserSourceModel::where(['uid'=>$uid,'from'=>$from])
+            ->field('nickname,headimgurl,sex,truename,auth_id,level,isblack,ispass,password')
+            ->find();
+    }
 
 
 }
