@@ -171,4 +171,18 @@ class YgUser
     }
 
 
+    /**
+     * 更新用户资料
+     * @param string $from
+     * @param $uid
+     * @param array $data
+     * @return UserSourceModel
+     */
+    static function updateUserInfo(string $from,$uid,array $data)
+    {
+        return  UserSourceModel::where(['uid'=>$uid,'from'=>$from])
+            ->update($data);
+    }
+
+
 }
