@@ -19,6 +19,8 @@ class UserLoginModel extends  Model{
     // 开启自动写入时间戳字段
     protected $autoWriteTimestamp = true;
 
+    protected $connection = 'YG_CENTER';
+
     public function __construct(array $data = [])
     {
         $this->table = env('database.prefix', '')."users_login";
