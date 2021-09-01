@@ -91,7 +91,7 @@ class YgUser
      */
     static function create_user_source(string $from,array $data)
     {
-        if(!UserLoginModel::where("userphone = '{$data['account']}' or email = '{$data['account']}' ")->where(['from'=>$from])->find()){
+        if(!UserSourceModel::where("userphone = '{$data['account']}' or email = '{$data['account']}' ")->where(['from'=>$from])->find()){
             $data['from'] = $from;
             self::createUserLogin($data);
             return UserSourceModel::create([
