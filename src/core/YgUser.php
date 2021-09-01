@@ -22,7 +22,6 @@ use Yg\YgCenter\model\UserSourceModel;
 class YgUser
 {
 
-
     /**
      * 账户登录 并返回用户信息
      * @param $account
@@ -33,7 +32,6 @@ class YgUser
      * @throws DbException
      * @throws ModelNotFoundException
      */
-
    static   function Login($account,$password,$from)
     {
         $find = UserLoginModel::where("userphone = '{$account}' or email = '{$account}' ")->find();
@@ -184,5 +182,25 @@ class YgUser
             ->update($data);
     }
 
+
+    /**
+     * 删除用户
+     * @param string $from
+     * @param $uid
+     * @return bool
+     */
+    static function delete_user(string $from,$uid){
+        return  UserSourceModel::where(['uid'=>$uid,'from'=>$from])
+            ->delete();
+    }
+
+
+    /**
+     * 获取用户最高等级
+     */
+    static function getUserLevel(string $mobile){
+       //查询当前用户是否是经销商
+        return UserSourceModel::where(['userphone'=>$mobile])->order('level','desc')->select();
+    }
 
 }
