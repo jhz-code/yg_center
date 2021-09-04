@@ -99,9 +99,33 @@ class YgUser
                 "update_time" => time(),
                 "equal_id" => $data['equal_id'],
                 "level" => $data['level'],
-                'userphone' => YgUserCheck::isEmail($data['email'])?$data['email']:"",
-                'email' =>  YgUserCheck::isPhone($data['userphone'])?$data['userphone']:"",
-                'useraccount'=>$data['account'],//用户账户
+                'userphone' => $data['userphone'],
+                'email' =>  $data['email'],
+                'useraccount'=>$data['useraccount'],//用户账户
+                'uid'=>$data['id'],//用户账户
+                'auth_id'=>$data['auth_id'],//用户账户
+                'state'=>$data['state'],//用户账户
+                'ispass'=>$data['ispass'],//用户账户
+                'auth_time'=>$data['auth_time'],//用户账户
+                'auth_endtime'=>$data['auth_endtime'],
+                'isblack'=>$data['isblack'],
+                'headimgurl'=>$data['headimgurl'],
+                'truename'=>$data['truename'],
+                'birthday'=>$data['birthday'],
+                'sex'=>$data['sex'],
+                'country'=>$data['country'],
+                'province'=>$data['province'],
+                'city'=>$data['city'],
+                'area'=>$data['area'],
+                'address'=>$data['address'],
+                'idcard_type'=>$data['idcard_type'],
+                'idcard_num'=>$data['idcard_num'],
+                'referee'=>$data['referee'],
+                'nid'=>$data['nid'],
+                'pid'=>$data['pid'],
+                'from'=>$data['from'],
+                'wxunionid'=>$data['wxunionid'],
+                'wxopenid'=>$data['wxopenid'],
             ]);
         }else{
             return "用户已存在";
@@ -148,7 +172,6 @@ class YgUser
      */
     static function getUserInfoByAccount(string $account,string $from){
        return  UserSourceModel::where("userphone = '{$account}' or email = '{$account}' ")->where(['from'=>$from])
-            ->field('nickname,headimgurl,sex,truename,auth_id,level,isblack,ispass,password')
             ->find();
     }
 
