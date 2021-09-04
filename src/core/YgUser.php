@@ -152,16 +152,6 @@ class YgUser
 
 
     /**
-     * 用户登录日志更新
-     * @param int $id
-     *
-     */
-   static  function userLoginUpdate(int $id){
-        UserLoginModel::where(['id'=>$id])->update(['login_time'=>time(),'login_ip'=>YgFunction::getClientIP()]);//记录用户登录时间
-    }
-
-
-    /**
      * 通过手机号读取用户信息
      * @param string $account
      * @param string $from
@@ -171,8 +161,32 @@ class YgUser
      * @throws ModelNotFoundException
      */
     static function getUserInfoByAccount(string $account,string $from){
-       return  UserSourceModel::where("userphone = '{$account}' or email = '{$account}' ")->where(['from'=>$from])
+        return  UserSourceModel::where("userphone = '{$account}' or email = '{$account}' ")->where(['from'=>$from])
             ->find();
+    }
+
+
+    /**
+     * 获取用户资料
+     * @param string $account
+     * @param string $from
+     * @return array|void
+     * @throws DataNotFoundException
+     * @throws DbException
+     * @throws ModelNotFoundException
+     */
+    static function getUserInfo(string $account,string $from){
+        if(UserLoginModel::where("userphone = '$account' or email = '$account' ")->find()){
+            if($from){
+                return UserSourceModel::where("userphone = '{$account}' or email = '{$account}' ")->where(['from'=>$from])
+                    ->find();
+            }else{
+                return UserSourceModel::where("userphone = '{$account}' or email = '{$account}' ")
+                    ->select();
+            }
+        }else{
+            return [];
+        }
     }
 
 
@@ -222,8 +236,8 @@ class YgUser
      * 获取用户最高等级
      */
     static function getUserLevel(string $mobile){
-       //查询当前用户是否是经销商
-        return UserSourceModel::where(['userphone'=>$mobile])->order('level','desc')->select();
+        //查询当前用户是否是经销商
+        return UserSourceModel::where(['userphone'=>$mobile])->field('level,from')->order('level','desc')->select()[0];
     }
 
 }
