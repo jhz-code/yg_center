@@ -7,6 +7,7 @@ use think\db\exception\DataNotFoundException;
 use think\db\exception\DbException;
 use think\db\exception\ModelNotFoundException;
 use think\Model;
+use think\route\Rule;
 use Yg\YgCenter\funcs\YgFunction;
 use Yg\YgCenter\lib\wxplatform\WxLogin;
 use Yg\YgCenter\lib\YgUserCheck;
@@ -22,17 +23,18 @@ use Yg\YgCenter\model\UserSourceModel;
 class YgUser
 {
 
+
     /**
      * 账户登录 并返回用户信息
      * @param $account
      * @param $password
-     * @param $from
+     * @param string $from
      * @return array|string
      * @throws DataNotFoundException
      * @throws DbException
      * @throws ModelNotFoundException
      */
-   static   function Login($account,$password,$from)
+   static   function Login($account, $password, string $from = "YG_YGXSj")
     {
         $find = UserLoginModel::where("userphone = '{$account}' or email = '{$account}' ")->find();
         //用户登陆成功,检索系统用户
@@ -43,11 +45,8 @@ class YgUser
                 ]);
             }
             //检索系统用户 , 返回关联用户数据
-            $UserInfo = UserSourceModel::where("userphone = '{$account}' or email = '{$account}' ")->where(['from'=>$from])
-                ->field('nickname,headimgurl,sex,truename,auth_id,level,isblack,ispass,password')
-                ->find();
+            $UserInfo = UserSourceModel::where("userphone = '{$account}' or email = '{$account}' ")->where(['from'=>$from])->find();
             if($UserInfo){
-               // self::userLoginUpdate($find['id']);
                 return $UserInfo->toArray();
             }else{
                 return [];
@@ -188,6 +187,26 @@ class YgUser
             return [];
         }
     }
+
+
+    /**
+     * 判断用户是否存在于经销商
+     * @param string $account
+     * @return bool
+     * @throws DataNotFoundException
+     * @throws DbException
+     * @throws ModelNotFoundException
+     */
+    static function checkUserExist(string $account)
+    {
+        if(UserLoginModel::where("userphone = '$account' or email = '$account' ")->find()){
+            return false;
+        }else{
+            return true;
+        }
+    }
+
+
 
 
     /**
