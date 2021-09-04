@@ -219,7 +219,6 @@ class YgUser
      */
     static function getUserInfoByUid(int $uid,string $from){
         return  UserSourceModel::where(['uid'=>$uid,'from'=>$from])
-            ->field('nickname,headimgurl,sex,truename,auth_id,level,isblack,ispass,password')
             ->find();
     }
 
