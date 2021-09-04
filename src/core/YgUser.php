@@ -47,7 +47,7 @@ class YgUser
                 ->field('nickname,headimgurl,sex,truename,auth_id,level,isblack,ispass,password')
                 ->find();
             if($UserInfo){
-                self::userLoginUpdate($find['id']);
+               // self::userLoginUpdate($find['id']);
                 return $UserInfo->toArray();
             }else{
                 return [];
@@ -152,15 +152,15 @@ class YgUser
 
 
     /**
-     * 通过手机号读取用户信息
+     * 通过账户读取用户信息
      * @param string $account
-     * @param string $from
+     * @param string $from //默认读取眼罩系统数据
      * @return array|Model|UserSourceModel|null
      * @throws DataNotFoundException
      * @throws DbException
      * @throws ModelNotFoundException
      */
-    static function getUserInfoByAccount(string $account,string $from){
+    static function getUserInfoByAccount(string $account,string $from = 'YG_YGXSj'){
         return  UserSourceModel::where("userphone = '{$account}' or email = '{$account}' ")->where(['from'=>$from])
             ->find();
     }
@@ -169,13 +169,13 @@ class YgUser
     /**
      * 获取用户资料
      * @param string $account
-     * @param string $from
+     * @param string $from //为空输出所有关联数据
      * @return array|void
      * @throws DataNotFoundException
      * @throws DbException
      * @throws ModelNotFoundException
      */
-    static function getUserInfo(string $account,string $from){
+    static function getUserInfo(string $account,string $from = ""){
         if(UserLoginModel::where("userphone = '$account' or email = '$account' ")->find()){
             if($from){
                 return UserSourceModel::where("userphone = '{$account}' or email = '{$account}' ")->where(['from'=>$from])
@@ -191,7 +191,7 @@ class YgUser
 
 
     /**
-     * 输出用户资料
+     * 通过用户UID数据用户数据
      * @param int $uid
      * @param string $from
      * @return array|Model|UserSourceModel|null
@@ -207,7 +207,7 @@ class YgUser
 
 
     /**
-     * 更新用户资料
+     * 更新用户资料信息
      * @param string $from
      * @param $uid
      * @param array $data
@@ -221,7 +221,7 @@ class YgUser
 
 
     /**
-     * 删除用户
+     * 删除用户相关数据
      * @param string $from
      * @param $uid
      * @return bool
