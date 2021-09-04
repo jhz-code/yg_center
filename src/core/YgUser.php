@@ -7,7 +7,6 @@ use think\db\exception\DataNotFoundException;
 use think\db\exception\DbException;
 use think\db\exception\ModelNotFoundException;
 use think\Model;
-use think\route\Rule;
 use Yg\YgCenter\funcs\YgFunction;
 use Yg\YgCenter\lib\wxplatform\WxLogin;
 use Yg\YgCenter\lib\YgUserCheck;
