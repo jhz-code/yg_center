@@ -33,7 +33,7 @@ class YgUser
      * @throws DbException
      * @throws ModelNotFoundException
      */
-   static   function Login($account, $password, string $from = "YG_YGXSj")
+   static  function Login($account, $password, string $from = "YG_YGXSj")
     {
         $find = UserLoginModel::where("userphone = '{$account}' or email = '{$account}' ")->find();
         //用户登陆成功,检索系统用户
@@ -140,11 +140,11 @@ class YgUser
      */
     static function createUserLogin(array $data){
        if(UserLoginModel::where("userphone = '{$data['account']}' or email = '{$data['account']}' ")->find())
-       $insert['email'] = YgUserCheck::isEmail($data['email'])?$data['email']:"";
-       $insert['userphone'] = YgUserCheck::isPhone($data['userphone'])?$data['userphone']:"";
-       $insert['password'] = password_hash($data['password'], PASSWORD_DEFAULT);
-       $insert['md5password'] = YgFunction::YgMd5String("ygxsj_.", $data['password']) ;
-       $insert['login_ip'] = YgFunction::getClientIP() ;
+       $insert['email'] = $data['email'];
+       $insert['userphone'] = $data['userphone'];
+       $insert['password'] = $data['password'];
+       $insert['md5password'] =  $data['md5password'] ;
+       $insert['login_ip'] = "" ;
        UserLoginModel::create($insert);
     }
 
@@ -162,6 +162,7 @@ class YgUser
         return  UserSourceModel::where("userphone = '{$account}' or email = '{$account}' ")->where(['from'=>$from])
             ->find();
     }
+
 
 
     /**
