@@ -9,7 +9,6 @@ use think\db\exception\ModelNotFoundException;
 use think\Model;
 use Yg\YgCenter\funcs\YgFunction;
 use Yg\YgCenter\lib\wxplatform\WxLogin;
-use Yg\YgCenter\lib\YgUserCheck;
 use Yg\YgCenter\model\UserLoginModel;
 use Yg\YgCenter\model\UserSourceModel;
 
@@ -22,60 +21,6 @@ use Yg\YgCenter\model\UserSourceModel;
 class YgUser
 {
 
-
-    /**
-     * 账户登录 并返回用户信息
-     * @param $account
-     * @param $password
-     * @param string $from
-     * @return array|string
-     * @throws DataNotFoundException
-     * @throws DbException
-     * @throws ModelNotFoundException
-     */
-   static  function Login($account, $password, string $from = "YG_YGXSj")
-    {
-        $find = UserLoginModel::where("userphone = '{$account}' or email = '{$account}' ")->find();
-        //用户登陆成功,检索系统用户
-        if($find && password_verify($password, $find['password'])) {
-            if(empty($find['md5password'])){
-                UserLoginModel::where(['id' => $find['id']])->update([
-                    'md5password' => YgFunction::YgMd5String("ygxsj_.",$password)
-                ]);
-            }
-            //检索系统用户 , 返回关联用户数据
-            $UserInfo = UserSourceModel::where("userphone = '{$account}' or email = '{$account}' ")->where(['from'=>$from])->find();
-            if($UserInfo){
-                return $UserInfo->toArray();
-            }else{
-                return [];
-            }
-        }else{
-            return  "密码错误";
-        }
-    }
-
-
-    /**
-     * 通过微信登录
-     */
-     static   function LoginByWx($appId,$appSecret,$from)
-      {
-        if(!empty($code)){
-            $wxPlatform = new  WxLogin($appId,$appSecret);
-            $result = $wxPlatform->getAccessToken($code);
-            $UserInfo = $wxPlatform->getUserInfo($result['openid'], $result['access_token']);
-            $res = UserSourceModel::where(['wxopenid'=>$UserInfo['wxopenid'],'from'=>$from])->find();
-            if($res){
-                //返回用户信息
-                return  $res[1];
-            }else{
-                return  [];
-            }
-        }else{
-            return [];
-        }
-    }
 
 
     /**
@@ -149,27 +94,12 @@ class YgUser
     }
 
 
-    /**
-     * 通过账户读取用户信息
-     * @param string $account
-     * @param string $from //默认读取眼罩系统数据
-     * @return array|Model|UserSourceModel|null
-     * @throws DataNotFoundException
-     * @throws DbException
-     * @throws ModelNotFoundException
-     */
-    static function getUserInfoByAccount(string $account,string $from = 'YG_YGXSj'){
-        return  UserSourceModel::where("userphone = '{$account}' or email = '{$account}' ")->where(['from'=>$from])
-            ->find();
-    }
-
-
 
     /**
      * 获取用户资料
-     * @param string $account
+     * @param string $account //手机号//邮箱//授权编号
      * @param string $from //为空输出所有关联数据
-     * @return array|void
+     * @return array
      * @throws DataNotFoundException
      * @throws DbException
      * @throws ModelNotFoundException
@@ -177,10 +107,10 @@ class YgUser
     static function getUserInfo(string $account,string $from = ""){
         if(UserLoginModel::where("userphone = '$account' or email = '$account' ")->find()){
             if($from){
-                return UserSourceModel::where("userphone = '{$account}' or email = '{$account}' ")->where(['from'=>$from])
+                return UserSourceModel::where("userphone = '{$account}' or email = '{$account}' or auth_id = '{$account}' ")->where(['from'=>$from])
                     ->find();
             }else{
-                return UserSourceModel::where("userphone = '{$account}' or email = '{$account}' ")
+                return UserSourceModel::where("userphone = '{$account}' or email = '{$account}' or auth_id = '{$account}' ")
                     ->select();
             }
         }else{
@@ -191,7 +121,7 @@ class YgUser
 
     /**
      * 判断用户是否存在于经销商
-     * @param string $account
+     * @param string $account //手机号//邮箱//授权
      * @return bool
      * @throws DataNotFoundException
      * @throws DbException
@@ -199,12 +129,18 @@ class YgUser
      */
     static function checkUserExist(string $account)
     {
+           //检测手机号或邮箱是否存在
         if(UserLoginModel::where("userphone = '$account' or email = '$account' ")->find()){
+            return false;
+            //检测授权编号是否存在
+        }else if(UserSourceModel::where("auth_id = '$account' ")->find()){
             return false;
         }else{
             return true;
         }
     }
+
+
 
 
 
@@ -219,8 +155,7 @@ class YgUser
      * @throws ModelNotFoundException
      */
     static function getUserInfoByUid(int $uid,string $from){
-        return  UserSourceModel::where(['uid'=>$uid,'from'=>$from])
-            ->find();
+        return  UserSourceModel::where(['uid'=>$uid,'from'=>$from])->find();
     }
 
 
@@ -251,11 +186,77 @@ class YgUser
 
 
     /**
-     * 获取用户最高等级
+     * 通过手机号获取用户最高等级
+     * @param string $mobile
+     * @return mixed|UserSourceModel
+     * @throws DataNotFoundException
+     * @throws DbException
+     * @throws ModelNotFoundException
      */
     static function getUserLevel(string $mobile){
         //查询当前用户是否是经销商
         return UserSourceModel::where(['userphone'=>$mobile])->field('level,from')->order('level','desc')->select()[0];
     }
+
+
+
+
+    /**
+     * 账户登录 并返回用户信息
+     * @param $account
+     * @param $password
+     * @param string $from
+     * @return array|string
+     * @throws DataNotFoundException
+     * @throws DbException
+     * @throws ModelNotFoundException
+     */
+    static  function Login($account, $password, string $from = "YG_YGXSj")
+    {
+        $find = UserLoginModel::where("userphone = '{$account}' or email = '{$account}' ")->find();
+        //用户登陆成功,检索系统用户
+        if($find && password_verify($password, $find['password'])) {
+            if(empty($find['md5password'])){
+                UserLoginModel::where(['id' => $find['id']])->update([
+                    'md5password' => YgFunction::YgMd5String("ygxsj_.",$password)
+                ]);
+            }
+            //检索系统用户 , 返回关联用户数据
+            $UserInfo = UserSourceModel::where("userphone = '{$account}' or email = '{$account}' ")->where(['from'=>$from])->find();
+            if($UserInfo){
+                return $UserInfo->toArray();
+            }else{
+                return [];
+            }
+        }else{
+            return  "密码错误";
+        }
+    }
+
+
+
+
+    /**
+     * 通过微信登录
+     */
+    static   function LoginByWx($appId,$appSecret,$from)
+    {
+        if(!empty($code)){
+            $wxPlatform = new  WxLogin($appId,$appSecret);
+            $result = $wxPlatform->getAccessToken($code);
+            $UserInfo = $wxPlatform->getUserInfo($result['openid'], $result['access_token']);
+            $res = UserSourceModel::where(['wxopenid'=>$UserInfo['wxopenid'],'from'=>$from])->find();
+            if($res){
+                //返回用户信息
+                return  $res[1];
+            }else{
+                return  [];
+            }
+        }else{
+            return [];
+        }
+    }
+
+
 
 }
