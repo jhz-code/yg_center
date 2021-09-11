@@ -97,21 +97,21 @@ class YgUser
 
     /**
      * 获取用户资料
-     * @param string $account //手机号//邮箱//授权编号
+     * @param string $account //手机号//邮箱
      * @param string $from //为空输出所有关联数据
      * @return array
      * @throws DataNotFoundException
      * @throws DbException
      * @throws ModelNotFoundException
      */
-    static function getUserInfo(string $account,string $from = ""){
+    static function getUserInfo(string $account,string $from = "")
+    {
         if(UserLoginModel::where("userphone = '$account' or email = '$account' ")->find()){
             if($from){
                 return UserSourceModel::where("userphone = '{$account}' or email = '{$account}' or auth_id = '{$account}' ")->where(['from'=>$from])
                     ->find();
             }else{
-                return UserSourceModel::where("userphone = '{$account}' or email = '{$account}' or auth_id = '{$account}' ")
-                    ->select();
+                return UserSourceModel::where("userphone = '{$account}' or email = '{$account}' or auth_id = '{$account}' ")->select();
             }
         }else{
             return [];
@@ -120,8 +120,21 @@ class YgUser
 
 
     /**
+     * @param string $token //通过第三方标识符获取用户信息  openID//unionID//authId
+     * @return array|Model|UserSourceModel|null
+     * @throws DataNotFoundException
+     * @throws DbException
+     * @throws ModelNotFoundException
+     */
+    static function getUserInfoByThirdToken(string $token){
+        return UserSourceModel::where("wxunionid = '{$token}' or wxopenid = '{$token}' or auth_id = '{auth_id}' ")->find();
+    }
+
+
+
+    /**
      * 判断用户是否存在于经销商
-     * @param string $account //手机号//邮箱//授权
+     * @param string $account //手机号//邮箱//授权//openID/unionID//
      * @return bool
      * @throws DataNotFoundException
      * @throws DbException
@@ -133,7 +146,7 @@ class YgUser
         if(UserLoginModel::where("userphone = '$account' or email = '$account' ")->find()){
             return false;
             //检测授权编号是否存在
-        }else if(UserSourceModel::where("auth_id = '$account' ")->find()){
+        }else if(UserSourceModel::where("wxunionid = '{$account}' or wxopenid = '{$account}' or auth_id = '{$account}'  ")->find()){
             return false;
         }else{
             return true;
@@ -155,7 +168,8 @@ class YgUser
      * @throws ModelNotFoundException
      */
     static function getUserInfoByUid(int $uid,string $from){
-        return  UserSourceModel::where(['uid'=>$uid,'from'=>$from])->find();
+        return  UserSourceModel::where(['uid'=>$uid,'from'=>$from])
+            ->find();
     }
 
 
