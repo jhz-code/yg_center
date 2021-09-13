@@ -3,14 +3,14 @@
 #配置数据库
 
 #  判断用户是否存在
-checkUserExist($account);
+YgUser::checkUserExist($account);
 //获取用户资料  
 # $from 数据来源,为空则调用此账户下所有用户数据
-getUserInfo($account,$from);
+YgUser::getUserInfo($account,$from);
 # 获取用户数据 默认拉取眼罩系统数据
-getUserInfoByAccount($account, $from = 'YG_YGXSj');
+YgUser::getUserInfoByAccount($account, $from = 'YG_YGXSj');
 # 获取用户最高等级
-getUserLevel($account);
+YgUser::getUserLevel($account);
 
 
 # 增加数据库配置中心
