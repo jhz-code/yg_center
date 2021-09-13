@@ -61,15 +61,15 @@ getUserLevel($account);
 #env 数据文件增加配置
 
 [DATABASE]
-TYPE = mysql
-HOSTNAME = xxxx
-DATABASE = yg_center
-USERNAME = xxxx
-PASSWORD = xxxx
-HOSTPORT = 3306
-PREFIX = yg_
-CHARSET = utf8
-DEBUG = true
+### TYPE = mysql
+### HOSTNAME = xxxx
+### DATABASE = yg_center
+### USERNAME = xxxx
+### PASSWORD = xxxx
+### HOSTPORT = 3306
+### PREFIX = yg_
+### CHARSET = utf8
+### DEBUG = true
 
 
 
