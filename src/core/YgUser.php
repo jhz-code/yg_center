@@ -108,10 +108,10 @@ class YgUser
     {
         if(UserLoginModel::where("userphone = '$account' or email = '$account' ")->find()){
             if($from){
-                return UserSourceModel::where("userphone = '{$account}' or email = '{$account}' or auth_id = '{$account}' ")->where(['from'=>$from])
+                return UserSourceModel::where("userphone = '{$account}' or email = '{$account} ")->where(['from'=>$from])
                     ->find();
             }else{
-                return UserSourceModel::where("userphone = '{$account}' or email = '{$account}' or auth_id = '{$account}' ")->select();
+                return UserSourceModel::where("userphone = '{$account}' or email = '{$account}' ")->select();
             }
         }else{
             return [];
@@ -155,9 +155,6 @@ class YgUser
 
 
 
-
-
-
     /**
      * 通过用户UID数据用户数据
      * @param int $uid
@@ -182,8 +179,7 @@ class YgUser
      */
     static function updateUserInfo(string $from,$uid,array $data)
     {
-        return  UserSourceModel::where(['uid'=>$uid,'from'=>$from])
-            ->update($data);
+        return  UserSourceModel::where(['uid'=>$uid,'from'=>$from])->update($data);
     }
 
 
@@ -194,8 +190,7 @@ class YgUser
      * @return bool
      */
     static function delete_user(string $from,$uid){
-        return  UserSourceModel::where(['uid'=>$uid,'from'=>$from])
-            ->delete();
+        return  UserSourceModel::where(['uid'=>$uid,'from'=>$from])->delete();
     }
 
 
