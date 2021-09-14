@@ -38,7 +38,7 @@ class YgUser
             $data['from'] = $from;
             self::createUserLogin($data);
             return UserSourceModel::create([
-                "create_time" => time(),
+                "create_time" => $data['create_time'],
                 "update_time" => time(),
                 "equal_id" => $data['equal_id'],
                 "level" => $data['level'],
