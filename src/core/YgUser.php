@@ -123,6 +123,7 @@ class YgUser
                 $userInfo['wx_unionid'] = $result['wxunionid'];
                 $userInfo['create_time'] = $result['create_time'];;
                 $userInfo['password'] = '';
+                $userInfo['from'] = $result['from'];
                 return $userInfo;
             }else{
                 $list =  UserSourceModel::where("userphone = '{$account}' or email = '{$account}' or auth_id = '{$account}'  ")->select();
@@ -141,6 +142,7 @@ class YgUser
                     $userList[$key]['wx_unionid'] = $value['wxunionid'];
                     $userList[$key]['create_time'] = $value['create_time'];;
                     $userList[$key]['password'] = '';
+                    $userList[$key]['from'] = $value['from'];
                 }
                 return $userList;
             }
