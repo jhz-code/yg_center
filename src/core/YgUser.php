@@ -94,29 +94,63 @@ class YgUser
     }
 
 
-
     /**
-     * 获取用户资料
+    * 获取用户资料
      * @param string $account //手机号//邮箱
      * @param string $from //为空输出所有关联数据
-     * @return array
+     * @param string $account
+     * @param string $from
+     * @return array|void
      * @throws DataNotFoundException
      * @throws DbException
      * @throws ModelNotFoundException
+     *
      */
     static function getUserInfo(string $account,string $from = "")
     {
-        if(UserLoginModel::where("userphone = '$account' or email = '$account' ")->find()){
             if($from){
-                return UserSourceModel::where("userphone = '{$account}' or email = '{$account} ")->where(['from'=>$from])
-                    ->find();
+                $result  =  UserSourceModel::where("userphone = '{$account}' or email = '{$account} or auth_id = '{$account}'  ")->where(['from'=>$from])->find();
+                $userInfo['username '] = $result['auth_id'];
+                $userInfo['phone'] = $result['mobile'];;
+                $userInfo['email'] = $result['email'];;
+                $userInfo['true_name'] = $result['true_name'];
+                $userInfo['pid'] = $result['equal_id'];
+                $userInfo['gender'] = $result['sex'];
+                $userInfo['nickname'] = $result['nickname'];
+                $userInfo['al_id'] = $result['level'];
+                $userInfo['pic_link'] = $result['headimgurl'];
+                $userInfo['wx_openid'] = $result['wxopenid'];
+                $userInfo['wx_unionid'] = $result['wxunionid'];
+                $userInfo['create_time'] = $result['create_time'];;
+                $userInfo['password'] = '';
+                return $userInfo;
             }else{
-                return UserSourceModel::where("userphone = '{$account}' or email = '{$account}' ")->select();
+                $list =  UserSourceModel::where("userphone = '{$account}' or email = '{$account}' or auth_id = '{$account}'  ")->select();
+                $userList = [];
+                foreach ($list as $key=>$value){
+                    $userList[$key]['username '] = $value['auth_id'];
+                    $userList[$key]['phone'] = $value['mobile'];;
+                    $userList[$key]['email'] = $value['email'];;
+                    $userList[$key]['true_name'] = $value['true_name'];
+                    $userList[$key]['pid'] = $value['equal_id'];
+                    $userList[$key]['gender'] = $value['sex'];
+                    $userList[$key]['nickname'] = $value['nickname'];
+                    $userList[$key]['al_id'] = $value['level'];
+                    $userList[$key]['pic_link'] = $value['headimgurl'];
+                    $userList[$key]['wx_openid'] = $value['wxopenid'];
+                    $userList[$key]['wx_unionid'] = $value['wxunionid'];
+                    $userList[$key]['create_time'] = $value['create_time'];;
+                    $userList[$key]['password'] = '';
+                }
+                return $userList;
             }
-        }else{
-            return [];
-        }
     }
+
+
+
+
+
+
 
 
     /**
