@@ -113,7 +113,7 @@ class YgUser
                 $userInfo['username '] = $result['auth_id'];
                 $userInfo['phone'] = $result['userphone'];;
                 $userInfo['email'] = $result['email'];;
-                $userInfo['true_name'] = $result['true_name'];
+                $userInfo['true_name'] = $result['truename'];
                 $userInfo['pid'] = $result['equal_id'];
                 $userInfo['gender'] = $result['sex'];
                 $userInfo['nickname'] = $result['nickname'];
@@ -132,7 +132,7 @@ class YgUser
                     $userList[$key]['username '] = $value['auth_id'];
                     $userList[$key]['phone'] = $value['userphone'];;
                     $userList[$key]['email'] = $value['email'];;
-                    $userList[$key]['true_name'] = $value['true_name'];
+                    $userList[$key]['true_name'] = $value['truename'];
                     $userList[$key]['pid'] = $value['equal_id'];
                     $userList[$key]['gender'] = $value['sex'];
                     $userList[$key]['nickname'] = $value['nickname'];
