@@ -127,7 +127,7 @@ class YgUser
                 $userInfo['from'] = $result['from'];
                 return $userInfo;
             }else{
-                $list =  UserSourceModel::where("userphone = '{$account}' or email = '{$account}' or auth_id = '{$account}'")->where('ispass = 1')->order('level,create_time',"desc")->select();
+                $list =  UserSourceModel::where("userphone = '{$account}' or email = '{$account}' or auth_id = '{$account}'")->where('ispass = 1')->order('level',"desc")->select();
                 $userList = [];
                 foreach ($list as $key=>$value){
                     $userList[$key]['id'] = $value['id'];
