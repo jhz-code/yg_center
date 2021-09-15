@@ -38,12 +38,12 @@ class YgUser
             $data['from'] = $from;
             self::createUserLogin($data);
             return UserSourceModel::create([
-                "create_time" => $data['create_time'],
+                "create_time" => $data['create_time']??0,
                 "update_time" => time(),
-                "equal_id" => $data['equal_id'],
-                "level" => $data['level'],
-                'userphone' => $data['userphone'],
-                'email' =>  $data['email'],
+                "equal_id" => $data['equal_id']??0,
+                "level" => $data['level']??0,
+                'userphone' => $data['userphone']??"",
+                'email' =>  $data['email']??"",
                 'useraccount'=>$data['useraccount'],//用户账户
                 'uid'=>$data['id'],//用户账户
                 'auth_id'=>$data['auth_id'],//用户账户
@@ -121,8 +121,8 @@ class YgUser
                 $userInfo['pic_link'] = $result['headimgurl'];
                 $userInfo['wx_openid'] = $result['wxopenid'];
                 $userInfo['wx_unionid'] = $result['wxunionid'];
-                $userInfo['create_time'] = $result['create_time'];;
-                $userInfo['password'] = '';
+                $userInfo['create_time'] = $result['create_time'];
+                $userInfo['password'] = self::getUserPassword($account);
                 $userInfo['from'] = $result['from'];
                 return $userInfo;
             }else{
@@ -141,7 +141,7 @@ class YgUser
                     $userList[$key]['wx_openid'] = $value['wxopenid'];
                     $userList[$key]['wx_unionid'] = $value['wxunionid'];
                     $userList[$key]['create_time'] = $value['create_time'];;
-                    $userList[$key]['password'] = '';
+                    $userList[$key]['password'] = self::getUserPassword($account);
                     $userList[$key]['from'] = $value['from'];
                 }
                 return $userList;
@@ -149,9 +149,23 @@ class YgUser
     }
 
 
-
-
-
+    /**
+     * 根据对应账户获取对应账户密码
+     * @param string $account
+     * @return mixed|string
+     * @throws DataNotFoundException
+     * @throws DbException
+     * @throws ModelNotFoundException
+     */
+   static function getUserPassword(string $account){
+       if($result = UserLoginModel::where("userphone = '{$account}' or email = '{$account}' ")->find()){
+           return $result['password'];
+       }else if($result = UserLoginModel::where("auth_id = '{$account}' or wxunionid = '{$account}'  or wxopenid = '{$account}' ")->find()){
+           return $result['password'];
+       }else{
+           return  '';
+       }
+   }
 
 
 
