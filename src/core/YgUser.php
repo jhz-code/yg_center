@@ -149,6 +149,25 @@ class YgUser
     }
 
 
+
+    static function getUserStruct($result){
+        $userInfo['username '] = $result['auth_id'];
+        $userInfo['phone'] = $result['userphone'];;
+        $userInfo['email'] = $result['email'];;
+        $userInfo['true_name'] = $result['truename'];
+        $userInfo['pid'] = $result['equal_id'];
+        $userInfo['gender'] = $result['sex'];
+        $userInfo['nickname'] = $result['nickname'];
+        $userInfo['al_id'] = $result['level'];
+        $userInfo['pic_link'] = $result['headimgurl'];
+        $userInfo['wx_openid'] = $result['wxopenid'];
+        $userInfo['wx_unionid'] = $result['wxunionid'];
+        $userInfo['create_time'] = $result['create_time'];
+        $userInfo['from'] = $result['from'];
+        return $userInfo;
+    }
+
+
     /**
      * 根据对应账户获取对应账户密码
      * @param string $account
@@ -281,9 +300,11 @@ class YgUser
                 ]);
             }
             //检索系统用户 , 返回关联用户数据
-            $UserInfo = UserSourceModel::where("userphone = '{$account}' or email = '{$account}' ")->where(['from'=>$from])->find();
+            $UserInfo = UserSourceModel::where("userphone = '{$account}' or email = '{$account}'")->where(['from'=>$from])->find();
             if($UserInfo){
-                return $UserInfo->toArray();
+                $UserInfo  = self::getUserStruct($UserInfo);
+                $UserInfo['password']  = self::getUserPassword($account);
+                return $UserInfo;
             }else{
                 return [];
             }
