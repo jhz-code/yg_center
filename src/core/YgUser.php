@@ -117,7 +117,7 @@ class YgUser
     static function getUserInfo(string $account,string $from = "")
     {
             if($from){
-                $result  =  UserSourceModel::where("userphone = '{$account}' or email = '{$account}' or auth_id = '{$account}'")->where(['from'=>$from])->find();
+                $result  =  UserSourceModel::where("userphone = '{$account}' or email = '{$account}' or auth_id = '{$account}'  or wxunionid = '{$account}'  or wxopenid = '{$account}'  ")->where(['from'=>$from])->find();
                 $userInfo['id'] = $result['id'];
                 $userInfo['username '] = $result['auth_id'];
                 $userInfo['phone'] = $result['userphone'];;
@@ -135,7 +135,7 @@ class YgUser
                 $userInfo['from'] = $result['from'];
                 return $userInfo;
             }else{
-                $list =  UserSourceModel::where("userphone = '{$account}' or email = '{$account}' or auth_id = '{$account}'")->where('ispass = 1')->order('level',"desc")->select();
+                $list =  UserSourceModel::where("userphone = '{$account}' or email = '{$account}' or auth_id = '{$account}'  or wxunionid = '{$account}'  or wxopenid = '{$account}' ")->where('ispass = 1')->order('level',"desc")->select();
                 $userList = [];
                 foreach ($list as $key=>$value){
                     $userList[$key]['id'] = $value['id'];
