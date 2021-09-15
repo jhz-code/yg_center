@@ -44,31 +44,31 @@ class YgUser
                 "level" => $data['level']??0,
                 'userphone' => $data['userphone']??"",
                 'email' =>  $data['email']??"",
-                'useraccount'=>$data['useraccount'],//用户账户
+                'useraccount'=>$data['useraccount']??"",//用户账户
                 'uid'=>$data['id'],//用户账户
-                'auth_id'=>$data['auth_id'],//用户账户
+                'auth_id'=>$data['auth_id']??"",//用户账户
                 'state'=>$data['state'],//用户账户
                 'ispass'=>$data['ispass'],//用户账户
                 'auth_time'=>$data['auth_time'],//用户账户
                 'auth_endtime'=>$data['auth_endtime'],
                 'isblack'=>$data['isblack'],
-                'headimgurl'=>$data['headimgurl'],
-                'truename'=>$data['truename'],
+                'headimgurl'=>$data['headimgurl']??'',
+                'truename'=>$data['truename']??'',
                 'birthday'=>$data['birthday'],
-                'sex'=>$data['sex'],
-                'country'=>$data['country'],
-                'province'=>$data['province'],
-                'city'=>$data['city'],
-                'area'=>$data['area'],
-                'address'=>$data['address'],
-                'idcard_type'=>$data['idcard_type'],
-                'idcard_num'=>$data['idcard_num'],
+                'sex'=>$data['sex']??0,
+                'country'=>$data['country']??'',
+                'province'=>$data['province']??'',
+                'city'=>$data['city']??'',
+                'area'=>$data['area']??'',
+                'address'=>$data['address']??'',
+                'idcard_type'=>$data['idcard_type']??0,
+                'idcard_num'=>$data['idcard_num']??'',
                 'referee'=>$data['referee'],
-                'nid'=>$data['nid'],
-                'pid'=>$data['pid'],
+                'nid'=>$data['nid']??0,
+                'pid'=>$data['pid']??0,
                 'from'=>$data['from'],
-                'wxunionid'=>$data['wxunionid'],
-                'wxopenid'=>$data['wxopenid'],
+                'wxunionid'=>$data['wxunionid']??'',
+                'wxopenid'=>$data['wxopenid']??'',
             ]);
         }else{
             return "用户已存在";
@@ -222,12 +222,11 @@ class YgUser
 
     /**
      * 更新用户资料信息
-     * @param string $from
-     * @param $uid
+     * @param int $uid
      * @param array $data
      * @return UserSourceModel
      */
-    static function updateUserInfo(string $from,$uid,array $data)
+    static function updateUserInfo(int $uid,array $data)
     {
         return  UserSourceModel::where(['id'=>$uid])->update($data);
     }
