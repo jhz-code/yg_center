@@ -84,13 +84,22 @@ class YgUser
      * @throws ModelNotFoundException
      */
     static function createUserLogin(array $data){
-       if(UserLoginModel::where("userphone = '{$data['account']}' or email = '{$data['account']}' ")->find())
-       $insert['email'] = $data['email'];
-       $insert['userphone'] = $data['userphone'];
-       $insert['password'] = $data['password'];
-       $insert['md5password'] =  $data['md5password'] ;
-       $insert['login_ip'] = "" ;
-       UserLoginModel::create($insert);
+       if(!UserLoginModel::where("userphone = '{$data['account']}' or email = '{$data['account']}' ")->find()){
+           if(!UserLoginModel::where("userphone = '{$data['account']}'")->find() && !UserLoginModel::where(['email'=>$data['account']])->find()){
+               $insert['email'] = $data['email'];
+               $insert['userphone'] = $data['userphone'];
+               $insert['password'] = $data['password'];
+               $insert['md5password'] =  $data['md5password'] ;
+               $insert['login_ip'] = "" ;
+               UserLoginModel::create($insert);
+           }else{
+               if($find = UserLoginModel::where("userphone = '{$data['account']}'")->find()){
+                   UserLoginModel::where(['id'=>$find["id"]])->update(['email'=>$data['account']]);
+               }else{
+                   UserLoginModel::where(['email'=>$find["account"]])->update(['userphone'=>$data['account']]);
+               }
+           }
+       }
     }
 
 
