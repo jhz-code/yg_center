@@ -109,7 +109,8 @@ class YgUser
     static function getUserInfo(string $account,string $from = "")
     {
             if($from){
-                $result  =  UserSourceModel::where("userphone = '{$account}' or email = '{$account} or auth_id = '{$account}'  ")->where(['from'=>$from])->find();
+                $result  =  UserSourceModel::where("userphone = '{$account}' or email = '{$account} or auth_id = '{$account}'")->where(['from'=>$from])->find();
+                $userInfo['id '] = $result['id'];
                 $userInfo['username '] = $result['auth_id'];
                 $userInfo['phone'] = $result['userphone'];;
                 $userInfo['email'] = $result['email'];;
@@ -126,9 +127,10 @@ class YgUser
                 $userInfo['from'] = $result['from'];
                 return $userInfo;
             }else{
-                $list =  UserSourceModel::where("userphone = '{$account}' or email = '{$account}' or auth_id = '{$account}'  ")->select();
+                $list =  UserSourceModel::where("userphone = '{$account}' or email = '{$account}' or auth_id = '{$account}'")->where('ispass = 1')->order('level,create_time',"desc")->select();
                 $userList = [];
                 foreach ($list as $key=>$value){
+                    $userList[$key]['id'] = $value['id'];
                     $userList[$key]['username '] = $value['auth_id'];
                     $userList[$key]['phone'] = $value['userphone'];;
                     $userList[$key]['email'] = $value['email'];;
@@ -148,24 +150,6 @@ class YgUser
             }
     }
 
-
-
-    static function getUserStruct($result){
-        $userInfo['username '] = $result['auth_id'];
-        $userInfo['phone'] = $result['userphone'];;
-        $userInfo['email'] = $result['email'];;
-        $userInfo['true_name'] = $result['truename'];
-        $userInfo['pid'] = $result['equal_id'];
-        $userInfo['gender'] = $result['sex'];
-        $userInfo['nickname'] = $result['nickname'];
-        $userInfo['al_id'] = $result['level'];
-        $userInfo['pic_link'] = $result['headimgurl'];
-        $userInfo['wx_openid'] = $result['wxopenid'];
-        $userInfo['wx_unionid'] = $result['wxunionid'];
-        $userInfo['create_time'] = $result['create_time'];
-        $userInfo['from'] = $result['from'];
-        return $userInfo;
-    }
 
 
     /**
@@ -188,18 +172,6 @@ class YgUser
 
 
 
-    /**
-     * @param string $token //通过第三方标识符获取用户信息  openID//unionID//authId
-     * @return array|Model|UserSourceModel|null
-     * @throws DataNotFoundException
-     * @throws DbException
-     * @throws ModelNotFoundException
-     */
-    static function getUserInfoByThirdToken(string $token){
-        return UserSourceModel::where("wxunionid = '{$token}' or wxopenid = '{$token}' or auth_id = '{auth_id}' ")->find();
-    }
-
-
 
     /**
      * 判断用户是否存在于经销商
@@ -215,7 +187,7 @@ class YgUser
         if(UserLoginModel::where("userphone = '$account' or email = '$account' ")->find()){
             return false;
             //检测授权编号是否存在
-        }else if(UserSourceModel::where("wxunionid = '{$account}' or wxopenid = '{$account}' or auth_id = '{$account}'  ")->find()){
+        }else if(UserSourceModel::where("wxunionid = '{$account}' or wxopenid = '{$account}' or auth_id = '{$account}' ")->find()){
             return false;
         }else{
             return true;
@@ -248,7 +220,7 @@ class YgUser
      */
     static function updateUserInfo(string $from,$uid,array $data)
     {
-        return  UserSourceModel::where(['uid'=>$uid,'from'=>$from])->update($data);
+        return  UserSourceModel::where(['id'=>$uid])->update($data);
     }
 
 
@@ -258,8 +230,8 @@ class YgUser
      * @param $uid
      * @return bool
      */
-    static function delete_user(string $from,$uid){
-        return  UserSourceModel::where(['uid'=>$uid,'from'=>$from])->delete();
+    static function delete_user(int $uid){
+        return  UserSourceModel::where(['id'=>$uid])->delete();
     }
 
 
@@ -280,7 +252,7 @@ class YgUser
 
 
     /**
-     * 账户登录 并返回用户信息
+     * 账户登录
      * @param $account
      * @param $password
      * @param string $from
@@ -291,6 +263,7 @@ class YgUser
      */
     static  function Login($account, $password, string $from = "YG_YGXSj")
     {
+
         $find = UserLoginModel::where("userphone = '{$account}' or email = '{$account}' ")->find();
         //用户登陆成功,检索系统用户
         if($find && password_verify($password, $find['password'])) {
@@ -299,18 +272,36 @@ class YgUser
                     'md5password' => YgFunction::YgMd5String("ygxsj_.",$password)
                 ]);
             }
-            //检索系统用户 , 返回关联用户数据
-            $UserInfo = UserSourceModel::where("userphone = '{$account}' or email = '{$account}'")->where(['from'=>$from])->find();
-            if($UserInfo){
-                $UserInfo  = self::getUserStruct($UserInfo);
-                $UserInfo['password']  = self::getUserPassword($account);
-                return $UserInfo;
-            }else{
-                return [];
+            return true;
+         }
+
+        //手机号
+        $findByAuthId = UserSourceModel::where("wxunionid = '{$account}' or wxopenid = '{$account}' or auth_id = '{$account}' ")->find();
+        if($findByAuthId && $findByAuthId['userphone']){
+            $find = UserLoginModel::where(['userphone'=>$findByAuthId['userphone']])->find();
+            if(password_verify($password, $find['password'])) {
+                if(empty($find['md5password'])){
+                    UserLoginModel::where(['id' => $find['id']])->update([
+                        'md5password' => YgFunction::YgMd5String("ygxsj_.",$password)
+                    ]);
+                }
+                return true;
             }
-        }else{
-            return  "密码错误";
         }
+
+        //邮箱
+        if($findByAuthId && $findByAuthId['email']){
+            $find = UserLoginModel::where(['email'=>$findByAuthId['email']])->find();
+            if(password_verify($password, $find['password'])) {
+                if(empty($find['md5password'])){
+                    UserLoginModel::where(['id' => $find['id']])->update([
+                        'md5password' => YgFunction::YgMd5String("ygxsj_.",$password)
+                    ]);
+                }
+                return true;
+            }
+        }
+        return false;
     }
 
 
