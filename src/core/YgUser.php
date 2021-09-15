@@ -272,7 +272,7 @@ class YgUser
                     'md5password' => YgFunction::YgMd5String("ygxsj_.",$password)
                 ]);
             }
-            return true;
+            return ['code'=>1,'msg'=>'密码校验成功'];
          }
 
         //手机号
@@ -285,7 +285,7 @@ class YgUser
                         'md5password' => YgFunction::YgMd5String("ygxsj_.",$password)
                     ]);
                 }
-                return true;
+                return ['code'=>1,'msg'=>'密码校验成功'];
             }
         }
 
@@ -298,34 +298,12 @@ class YgUser
                         'md5password' => YgFunction::YgMd5String("ygxsj_.",$password)
                     ]);
                 }
-                return true;
+                return ['code'=>1,'msg'=>'密码校验成功'];
+
             }
         }
-        return false;
-    }
+        return ['code'=>0,'msg'=>'抱歉，密码错误'];
 
-
-
-
-    /**
-     * 通过微信登录
-     */
-    static   function LoginByWx($appId,$appSecret,$from)
-    {
-        if(!empty($code)){
-            $wxPlatform = new  WxLogin($appId,$appSecret);
-            $result = $wxPlatform->getAccessToken($code);
-            $UserInfo = $wxPlatform->getUserInfo($result['openid'], $result['access_token']);
-            $res = UserSourceModel::where(['wxopenid'=>$UserInfo['wxopenid'],'from'=>$from])->find();
-            if($res){
-                //返回用户信息
-                return  $res[1];
-            }else{
-                return  [];
-            }
-        }else{
-            return [];
-        }
     }
 
 
