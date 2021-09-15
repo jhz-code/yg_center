@@ -8,7 +8,6 @@ use think\db\exception\DbException;
 use think\db\exception\ModelNotFoundException;
 use think\Model;
 use Yg\YgCenter\funcs\YgFunction;
-use Yg\YgCenter\lib\wxplatform\WxLogin;
 use Yg\YgCenter\model\UserLoginModel;
 use Yg\YgCenter\model\UserSourceModel;
 
@@ -280,7 +279,7 @@ class YgUser
                     'md5password' => YgFunction::YgMd5String("ygxsj_.",$password)
                 ]);
             }
-            return ['code'=>1,'msg'=>'密码校验成功'];
+            return ['code'=>2,'msg'=>'密码校验成功'];
          }
 
         //手机号
@@ -293,7 +292,7 @@ class YgUser
                         'md5password' => YgFunction::YgMd5String("ygxsj_.",$password)
                     ]);
                 }
-                return ['code'=>1,'msg'=>'密码校验成功'];
+                return ['code'=>2,'msg'=>'密码校验成功'];
             }
         }
 
@@ -306,11 +305,11 @@ class YgUser
                         'md5password' => YgFunction::YgMd5String("ygxsj_.",$password)
                     ]);
                 }
-                return ['code'=>1,'msg'=>'密码校验成功'];
+                return ['code'=>2,'msg'=>'密码校验成功'];
 
             }
         }
-        return ['code'=>0,'msg'=>'抱歉，密码错误'];
+        return ['code'=>1,'msg'=>'抱歉，密码错误'];
 
     }
 
