@@ -172,7 +172,7 @@ class YgUser
    static function getUserPassword(string $account){
        if($result = UserLoginModel::where("userphone = '{$account}' or email = '{$account}' ")->find()){
            return $result['password'];
-       }else if($result = UserLoginModel::where("auth_id = '{$account}' or wxunionid = '{$account}'  or wxopenid = '{$account}' ")->find()){
+       }else if($result = UserSourceModel::where("auth_id = '{$account}' or wxunionid = '{$account}'  or wxopenid = '{$account}' ")->find()){
            return $result['password'];
        }else{
            return  '';
