@@ -118,7 +118,7 @@ class YgUser
     static function getUserInfo(string $account,string $from = "")
     {
             if($from){
-                $result  =  UserSourceModel::where("userphone = '{$account}' or email = '{$account} or auth_id = '{$account}'")->where(['from'=>$from])->find();
+                $result  =  UserSourceModel::where("userphone = '{$account}' or email = '{$account}' or auth_id = '{$account}'")->where(['from'=>$from])->find();
                 $userInfo['id '] = $result['id'];
                 $userInfo['username '] = $result['auth_id'];
                 $userInfo['phone'] = $result['userphone'];;
