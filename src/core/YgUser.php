@@ -118,7 +118,7 @@ class YgUser
     {
             if($from){
                 $result  =  UserSourceModel::where("userphone = '{$account}' or email = '{$account}' or auth_id = '{$account}'")->where(['from'=>$from])->find();
-                $userInfo['id '] = $result['id'];
+                $userInfo['id'] = $result['id'];
                 $userInfo['username '] = $result['auth_id'];
                 $userInfo['phone'] = $result['userphone'];;
                 $userInfo['email'] = $result['email'];;
@@ -139,7 +139,7 @@ class YgUser
                 $userList = [];
                 foreach ($list as $key=>$value){
                     $userList[$key]['id'] = $value['id'];
-                    $userList[$key]['username '] = $value['auth_id'];
+                    $userList[$key]['username'] = $value['auth_id'];
                     $userList[$key]['phone'] = $value['userphone'];;
                     $userList[$key]['email'] = $value['email'];;
                     $userList[$key]['true_name'] = $value['truename'];
