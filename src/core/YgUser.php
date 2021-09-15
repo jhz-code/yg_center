@@ -271,7 +271,7 @@ class YgUser
      */
     static  function Login($account, $password, string $from = "YG_YGXSj")
     {
-
+        if(!self::checkUserExist($account))return ['code'=>0,'msg'=>'当前账户未注册'];
         $find = UserLoginModel::where("userphone = '{$account}' or email = '{$account}' ")->find();
         //用户登陆成功,检索系统用户
         if($find && password_verify($password, $find['password'])) {
