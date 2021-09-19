@@ -51,7 +51,7 @@ class YgUser
     static function create_user_source(string $from,array $data)
     {
         if(!UserSourceModel::where("userphone = '{$data['account']}' or email = '{$data['account']}' ")->where(['from'=>$from])->find()){
-            $data['from'] = $from;
+            $data['source_from'] = $from;
             self::createUserLogin($data);
             return UserSourceModel::create([
                 "create_time" => $data['create_time']??0,
@@ -82,7 +82,7 @@ class YgUser
                 'referee'=>$data['referee']??"",
                 'nid'=>$data['nid']??0,
                 'pid'=>$data['pid']??0,
-                'from'=>$data['from'],
+                'source_from'=>$data['source_from'],
                 'wxunionid'=>$data['wxunionid']??'',
                 'wxopenid'=>$data['wxopenid']??'',
             ]);
@@ -148,7 +148,7 @@ class YgUser
             $userInfo['wx_unionid'] = $result['wxunionid'];
             $userInfo['create_time'] = $result['create_time'];
             $userInfo['password'] = self::getUserPassword($account);
-            $userInfo['from_type'] = $result['from'];
+            $userInfo['from_type'] = $result['source_from'];
             return $userInfo;
         }else{
             $list =  UserSourceModel::where("userphone = '{$account}' or email = '{$account}' or auth_id = '{$account}'  or wxunionid = '{$account}'  or wxopenid = '{$account}' ")->where('ispass = 1')->order('level',"desc")->select();
@@ -168,7 +168,7 @@ class YgUser
                 $userList[$key]['wx_unionid'] = $value['wxunionid'];
                 $userList[$key]['create_time'] = $value['create_time'];;
                 $userList[$key]['password'] = self::getUserPassword($account);
-                $userList[$key]['from_type'] = $value['from'];
+                $userList[$key]['from_type'] = $value['source_from'];
             }
             return $userList;
         }
@@ -230,7 +230,7 @@ class YgUser
      * @throws ModelNotFoundException
      */
     static function getUserInfoByUid(int $uid,string $from){
-        return  UserSourceModel::where(['uid'=>$uid,'from'=>$from])
+        return  UserSourceModel::where(['uid'=>$uid,'source_from'=>$from])
             ->find();
     }
 
@@ -268,7 +268,7 @@ class YgUser
      */
     static function getUserLevel(string $mobile){
         //查询当前用户是否是经销商
-        return UserSourceModel::where(['userphone'=>$mobile])->field('level,from')->order('level','desc')->select()[0];
+        return UserSourceModel::where(['userphone'=>$mobile])->field('level,source_from')->order('level','desc')->select()[0];
     }
 
 
@@ -286,6 +286,7 @@ class YgUser
      */
     static  function Login($account, $password, string $from = "YG_YGXSj")
     {
+
         if(self::checkUserExist($account))return ['code'=>0,'msg'=>'当前账户未注册'];
         $find = UserLoginModel::where("userphone = '{$account}' or email = '{$account}' ")->find();
         //用户登陆成功,检索系统用户
