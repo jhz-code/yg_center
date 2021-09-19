@@ -21,6 +21,21 @@ class YgUser
 {
 
 
+    /**
+     * @throws ModelNotFoundException
+     * @throws DbException
+     * @throws DataNotFoundException
+     */
+    static function save_user_source(string $username, string $password, string $phone = '', $email = '', int $level = 1, string $from = 'YG_GZHY'){
+       $data['auth_id'] = $username;
+       $data['userphone'] =  $phone;
+       $data['email'] =  $email;
+       $data['password'] =  $password;
+       $data['level'] =  $level;
+       if(self::create_user_source($from,$data)){return ['code'=>1,'msg'=>'账户创建成功'];}else{return ['code'=>0,'msg'=>'账户创建失败'];}
+    }
+
+
 
     /**
      * 创建用户资源
@@ -70,7 +85,7 @@ class YgUser
                 'wxopenid'=>$data['wxopenid']??'',
             ]);
         }else{
-            return "用户已存在";
+            return false;
         }
     }
 
@@ -132,7 +147,7 @@ class YgUser
                 $userInfo['wx_unionid'] = $result['wxunionid'];
                 $userInfo['create_time'] = $result['create_time'];
                 $userInfo['password'] = self::getUserPassword($account);
-                $userInfo['from'] = $result['from'];
+                $userInfo['from_type'] = $result['from'];
                 return $userInfo;
             }else{
                 $list =  UserSourceModel::where("userphone = '{$account}' or email = '{$account}' or auth_id = '{$account}'")->where('ispass = 1')->order('level',"desc")->select();
@@ -152,7 +167,7 @@ class YgUser
                     $userList[$key]['wx_unionid'] = $value['wxunionid'];
                     $userList[$key]['create_time'] = $value['create_time'];;
                     $userList[$key]['password'] = self::getUserPassword($account);
-                    $userList[$key]['from'] = $value['from'];
+                    $userList[$key]['from_type'] = $value['from'];
                 }
                 return $userList;
             }
