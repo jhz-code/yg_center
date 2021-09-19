@@ -26,13 +26,15 @@ class YgUser
      * @throws DbException
      * @throws DataNotFoundException
      */
-    static function save_user_source(string $username, string $password, string $phone = '', $email = '', int $level = 1, string $from = 'YG_GZHY'){
-       $data['auth_id'] = $username;
-       $data['userphone'] =  $phone;
-       $data['email'] =  $email;
-       $data['password'] =  $password;
-       $data['level'] =  $level;
-       if(self::create_user_source($from,$data)){return ['code'=>1,'msg'=>'账户创建成功'];}else{return ['code'=>0,'msg'=>'账户创建失败'];}
+    static function save_user_source(int $uid,string $username, string $password, string $phone = '', $email = '', int $level = 1, string $from = 'YG_GZHY'){
+        $data['id'] = $uid;
+        $data['auth_id'] = $username;
+        $data['account'] = $username;
+        $data['userphone'] =  $phone;
+        $data['email'] =  $email;
+        $data['password'] =  $password;
+        $data['level'] =  $level;
+        if(self::create_user_source($from,$data)){return ['code'=>1,'msg'=>'账户创建成功'];}else{return ['code'=>0,'msg'=>'账户创建失败'];}
     }
 
 
@@ -61,14 +63,14 @@ class YgUser
                 'useraccount'=>$data['useraccount']??"",//用户账户
                 'uid'=>$data['id'],//用户账户
                 'auth_id'=>$data['auth_id']??"",//用户账户
-                'state'=>$data['state'],//用户账户
-                'ispass'=>$data['ispass'],//用户账户
-                'auth_time'=>$data['auth_time'],//用户账户
-                'auth_endtime'=>$data['auth_endtime'],
-                'isblack'=>$data['isblack'],
+                'state'=> $data['state']??0,//用户账户
+                'ispass'=>$data['ispass']??0,//用户账户
+                'auth_time'=>$data['auth_time']??0,//用户账户
+                'auth_endtime'=>$data['auth_endtime']??0,
+                'isblack'=>$data['isblack']??0,
                 'headimgurl'=>$data['headimgurl']??'',
                 'truename'=>$data['truename']??'',
-                'birthday'=>$data['birthday'],
+                'birthday'=>$data['birthday']??0,
                 'sex'=>$data['sex']??0,
                 'country'=>$data['country']??'',
                 'province'=>$data['province']??'',
@@ -77,7 +79,7 @@ class YgUser
                 'address'=>$data['address']??'',
                 'idcard_type'=>$data['idcard_type']??0,
                 'idcard_num'=>$data['idcard_num']??'',
-                'referee'=>$data['referee'],
+                'referee'=>$data['referee']??"",
                 'nid'=>$data['nid']??0,
                 'pid'=>$data['pid']??0,
                 'from'=>$data['from'],
@@ -98,27 +100,26 @@ class YgUser
      * @throws ModelNotFoundException
      */
     static function createUserLogin(array $data){
-       if(!UserLoginModel::where("userphone = '{$data['account']}' or email = '{$data['account']}' ")->find()){
-           if(!UserLoginModel::where("userphone = '{$data['account']}'")->find() && !UserLoginModel::where(['email'=>$data['account']])->find()){
-               $insert['email'] = $data['email'];
-               $insert['userphone'] = $data['userphone'];
-               $insert['password'] = $data['password'];
-               $insert['md5password'] =  $data['md5password'] ;
-               $insert['login_ip'] = "" ;
-               UserLoginModel::create($insert);
-           }else{
-               if($find = UserLoginModel::where("userphone = '{$data['account']}'")->find()){
-                   UserLoginModel::where(['id'=>$find["id"]])->update(['email'=>$data['account']]);
-               }else{
-                   UserLoginModel::where(['email'=>$find["account"]])->update(['userphone'=>$data['account']]);
-               }
-           }
-       }
+        if(!UserLoginModel::where("userphone = '{$data['account']}' or email = '{$data['account']}' ")->find()){
+            if(!UserLoginModel::where("userphone = '{$data['account']}'")->find() && !UserLoginModel::where(['email'=>$data['account']])->find()){
+                $insert['email'] = $data['email'];
+                $insert['userphone'] = $data['userphone'];
+                $insert['password'] = $data['password'];
+                $insert['login_ip'] = "" ;
+                UserLoginModel::create($insert);
+            }else{
+                if($find = UserLoginModel::where("userphone = '{$data['account']}'")->find()){
+                    UserLoginModel::where(['id'=>$find["id"]])->update(['email'=>$data['account']]);
+                }else{
+                    UserLoginModel::where(['email'=>$find["account"]])->update(['userphone'=>$data['account']]);
+                }
+            }
+        }
     }
 
 
     /**
-    * 获取用户资料
+     * 获取用户资料
      * @param string $account //手机号//邮箱
      * @param string $from //为空输出所有关联数据
      * @param string $account
@@ -131,46 +132,46 @@ class YgUser
      */
     static function getUserInfo(string $account,string $from = "")
     {
-            if($from){
-                $result  =  UserSourceModel::where("userphone = '{$account}' or email = '{$account}' or auth_id = '{$account}'  or wxunionid = '{$account}'  or wxopenid = '{$account}'  ")->where(['from'=>$from])->find();
-                $userInfo['id'] = $result['id'];
-                $userInfo['username '] = $result['auth_id'];
-                $userInfo['phone'] = $result['userphone'];;
-                $userInfo['email'] = $result['email'];;
-                $userInfo['true_name'] = $result['truename'];
-                $userInfo['pid'] = $result['equal_id'];
-                $userInfo['gender'] = $result['sex'];
-                $userInfo['nickname'] = $result['nickname'];
-                $userInfo['al_id'] = $result['level'];
-                $userInfo['pic_link'] = $result['headimgurl'];
-                $userInfo['wx_openid'] = $result['wxopenid'];
-                $userInfo['wx_unionid'] = $result['wxunionid'];
-                $userInfo['create_time'] = $result['create_time'];
-                $userInfo['password'] = self::getUserPassword($account);
-                $userInfo['from_type'] = $result['from'];
-                return $userInfo;
-            }else{
-                $list =  UserSourceModel::where("userphone = '{$account}' or email = '{$account}' or auth_id = '{$account}'  or wxunionid = '{$account}'  or wxopenid = '{$account}' ")->where('ispass = 1')->order('level',"desc")->select();
-                $userList = [];
-                foreach ($list as $key=>$value){
-                    $userList[$key]['id'] = $value['id'];
-                    $userList[$key]['username'] = $value['auth_id'];
-                    $userList[$key]['phone'] = $value['userphone'];;
-                    $userList[$key]['email'] = $value['email'];;
-                    $userList[$key]['true_name'] = $value['truename'];
-                    $userList[$key]['pid'] = $value['equal_id'];
-                    $userList[$key]['gender'] = $value['sex'];
-                    $userList[$key]['nickname'] = $value['nickname'];
-                    $userList[$key]['al_id'] = $value['level'];
-                    $userList[$key]['pic_link'] = $value['headimgurl'];
-                    $userList[$key]['wx_openid'] = $value['wxopenid'];
-                    $userList[$key]['wx_unionid'] = $value['wxunionid'];
-                    $userList[$key]['create_time'] = $value['create_time'];;
-                    $userList[$key]['password'] = self::getUserPassword($account);
-                    $userList[$key]['from_type'] = $value['from'];
-                }
-                return $userList;
+        if($from){
+            $result  =  UserSourceModel::where("userphone = '{$account}' or email = '{$account}' or auth_id = '{$account}'  or wxunionid = '{$account}'  or wxopenid = '{$account}'  ")->where(['from'=>$from])->find();
+            $userInfo['id'] = $result['id'];
+            $userInfo['username '] = $result['auth_id'];
+            $userInfo['phone'] = $result['userphone'];;
+            $userInfo['email'] = $result['email'];;
+            $userInfo['true_name'] = $result['truename'];
+            $userInfo['pid'] = $result['equal_id'];
+            $userInfo['gender'] = $result['sex'];
+            $userInfo['nickname'] = $result['nickname'];
+            $userInfo['al_id'] = $result['level'];
+            $userInfo['pic_link'] = $result['headimgurl'];
+            $userInfo['wx_openid'] = $result['wxopenid'];
+            $userInfo['wx_unionid'] = $result['wxunionid'];
+            $userInfo['create_time'] = $result['create_time'];
+            $userInfo['password'] = self::getUserPassword($account);
+            $userInfo['from_type'] = $result['from'];
+            return $userInfo;
+        }else{
+            $list =  UserSourceModel::where("userphone = '{$account}' or email = '{$account}' or auth_id = '{$account}'  or wxunionid = '{$account}'  or wxopenid = '{$account}' ")->where('ispass = 1')->order('level',"desc")->select();
+            $userList = [];
+            foreach ($list as $key=>$value){
+                $userList[$key]['id'] = $value['id'];
+                $userList[$key]['username'] = $value['auth_id'];
+                $userList[$key]['phone'] = $value['userphone'];;
+                $userList[$key]['email'] = $value['email'];;
+                $userList[$key]['true_name'] = $value['truename'];
+                $userList[$key]['pid'] = $value['equal_id'];
+                $userList[$key]['gender'] = $value['sex'];
+                $userList[$key]['nickname'] = $value['nickname'];
+                $userList[$key]['al_id'] = $value['level'];
+                $userList[$key]['pic_link'] = $value['headimgurl'];
+                $userList[$key]['wx_openid'] = $value['wxopenid'];
+                $userList[$key]['wx_unionid'] = $value['wxunionid'];
+                $userList[$key]['create_time'] = $value['create_time'];;
+                $userList[$key]['password'] = self::getUserPassword($account);
+                $userList[$key]['from_type'] = $value['from'];
             }
+            return $userList;
+        }
     }
 
 
@@ -183,15 +184,15 @@ class YgUser
      * @throws DbException
      * @throws ModelNotFoundException
      */
-   static function getUserPassword(string $account){
-       if($result = UserLoginModel::where("userphone = '{$account}' or email = '{$account}' ")->find()){
-           return $result['password'];
-       }else if($result = UserSourceModel::where("auth_id = '{$account}' or wxunionid = '{$account}'  or wxopenid = '{$account}' ")->find()){
-           return $result['password'];
-       }else{
-           return  '';
-       }
-   }
+    static function getUserPassword(string $account){
+        if($result = UserLoginModel::where("userphone = '{$account}' or email = '{$account}' ")->find()){
+            return $result['password'];
+        }else if($result = UserSourceModel::where("auth_id = '{$account}' or wxunionid = '{$account}'  or wxopenid = '{$account}' ")->find()){
+            return $result['password'];
+        }else{
+            return  '';
+        }
+    }
 
 
 
@@ -206,7 +207,7 @@ class YgUser
      */
     static function checkUserExist(string $account)
     {
-           //检测手机号或邮箱是否存在
+        //检测手机号或邮箱是否存在
         if(UserLoginModel::where("userphone = '$account' or email = '$account' ")->find()){
             return false;
             //检测授权编号是否存在
@@ -295,7 +296,7 @@ class YgUser
                 ]);
             }
             return ['code'=>2,'msg'=>'密码校验成功'];
-         }
+        }
 
         //手机号
         $findByAuthId = UserSourceModel::where("wxunionid = '{$account}' or wxopenid = '{$account}' or auth_id = '{$account}' ")->find();
