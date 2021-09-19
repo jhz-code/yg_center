@@ -50,8 +50,7 @@ class YgUser
      */
     static function create_user_source(string $from,array $data)
     {
-        if(!UserSourceModel::where("userphone = '{$data['account']}' or email = '{$data['account']}' ")->where(['from'=>$from])->find()){
-            $data['source_from'] = $from;
+        if(!UserSourceModel::where("userphone = '{$data['account']}' or email = '{$data['account']}' ")->where(['source_from'=>$from])->find()){
             self::createUserLogin($data);
             return UserSourceModel::create([
                 "create_time" => $data['create_time']??0,
@@ -82,7 +81,7 @@ class YgUser
                 'referee'=>$data['referee']??"",
                 'nid'=>$data['nid']??0,
                 'pid'=>$data['pid']??0,
-                'source_from'=>$data['source_from'],
+                'source_from'=>$from,
                 'wxunionid'=>$data['wxunionid']??'',
                 'wxopenid'=>$data['wxopenid']??'',
             ]);
