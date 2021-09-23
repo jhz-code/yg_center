@@ -34,6 +34,7 @@ class YgUser
         $data['email'] =  $email;
         $data['password'] =  $password;
         $data['level'] =  $level;
+        $from = self::switch_sourFrom_by_int($from);
         if(self::create_user_source($from,$data)){return ['code'=>1,'msg'=>'账户创建成功'];}else{return ['code'=>0,'msg'=>'账户创建失败'];}
     }
 
@@ -349,7 +350,22 @@ class YgUser
             default :
                 return 0;
         }
+    }
 
+
+    static function switch_sourFrom_by_int(int $type){
+        switch ($type){
+            case 1:
+                return "YG_YGXSj" ;
+            case 2:
+                return "YG_TLQF";
+            case 3:
+                return "YG_GZHY";
+            case 4:
+                return "YG_SHOP";
+            default :
+                return 0;
+        }
     }
 
 
