@@ -147,7 +147,7 @@ class YgUser
             $userInfo['wx_unionid'] = $result['wxunionid'];
             $userInfo['create_time'] = $result['create_time'];
             $userInfo['password'] = self::getUserPassword($account);
-            $userInfo['from_type'] = $result['source_from'];
+            $userInfo['from_type'] = self::switch_sourceFrom_by_string($result['source_from']);
             return $userInfo;
         }else{
             $list =  UserSourceModel::where("userphone = '{$account}' or email = '{$account}' or auth_id = '{$account}'  or wxunionid = '{$account}'  or wxopenid = '{$account}' ")->where('ispass = 1')->order('level',"desc")->select();
@@ -167,7 +167,7 @@ class YgUser
                 $userList[$key]['wx_unionid'] = $value['wxunionid'];
                 $userList[$key]['create_time'] = $value['create_time'];;
                 $userList[$key]['password'] = self::getUserPassword($account);
-                $userList[$key]['from_type'] = $value['source_from'];
+                $userList[$key]['from_type'] = self::switch_sourceFrom_by_string($value['source_from']);
             }
             return $userList;
         }
@@ -326,6 +326,29 @@ class YgUser
             }
         }
         return ['code'=>1,'msg'=>'抱歉，密码错误'];
+
+    }
+
+
+    /**
+     *来源转换
+     * @param string $type
+     * @return int
+     */
+    static function switch_sourceFrom_by_string(string $type): int
+    {
+        switch ($type){
+            case "YG_YGXSj":
+                return 1 ;
+            case "YG_TLQF":
+                return 2;
+            case "YG_GZHY":
+                return 3;
+            case "YG_SHOP":
+                return 4;
+            default :
+                return 0;
+        }
 
     }
 
