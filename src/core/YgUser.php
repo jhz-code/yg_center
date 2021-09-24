@@ -70,6 +70,7 @@ class YgUser
                 'isblack'=>$data['isblack']??0,
                 'headimgurl'=>$data['headimgurl']??'',
                 'truename'=>$data['truename']??'',
+                'nickname'=>$data['nickname']??'',
                 'birthday'=>$data['birthday']??0,
                 'sex'=>$data['sex']??0,
                 'country'=>$data['country']??'',
