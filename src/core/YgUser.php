@@ -6,6 +6,7 @@ namespace Yg\YgCenter\core;
 use think\db\exception\DataNotFoundException;
 use think\db\exception\DbException;
 use think\db\exception\ModelNotFoundException;
+use think\facade\Db;
 use think\Model;
 use Yg\YgCenter\funcs\YgFunction;
 use Yg\YgCenter\model\UserLoginModel;
@@ -19,7 +20,6 @@ use Yg\YgCenter\model\UserSourceModel;
  */
 class YgUser
 {
-
 
     /**
      * @throws ModelNotFoundException
@@ -36,6 +36,41 @@ class YgUser
         $data['level'] =  $level;
         $from = self::switch_sourFrom_by_int($from);
         if(self::create_user_source($from,$data)){return ['code'=>1,'msg'=>'账户创建成功'];}else{return ['code'=>0,'msg'=>'账户创建失败'];}
+    }
+
+
+    /**
+     * 更新用户数据
+     * @param string $authId
+     * @param array $data
+     * @throws DataNotFoundException
+     * @throws DbException
+     * @throws ModelNotFoundException
+     */
+    static function update_user_source(string $authId,array $data){
+        $update['userphone'] = $data['phone']??"";
+        $update['email'] =    $data['email']??"" ;
+        $update['truename'] = $data['true_name']??"";
+        $update['equal_id'] = $data['pid']??"";
+        $update['sex'] = $data['gender']??"";
+        $update['nickname'] = $data['nickname']??"";
+        $update['level'] = $data['al_id']??"";
+        $update['headimgurl'] = $data['pic_link']??"";
+        $update['wxopenid'] = $data['wx_openid']??"";
+        $update['wxunionid'] = $data['wx_unionid']??"";
+        $update['create_time']=$data['create_time'];
+        foreach ($update as $key =>$value){
+            if(empty($value)){
+              unset($update[$key]);
+            }
+        }
+        Db::transaction(function () use ($update, $authId) {
+            UserSourceModel::where(['auth_id'=>$authId])->update($update);
+            if(isset($data['password'])){
+                $findUser = UserSourceModel::where(['auth_id'=>$authId])->find();
+                UserLoginModel::where("userphone = '{$findUser['userphone']}' or email = '{$findUser['email']}' ")->update(['password'=>$data['password']]);
+            }
+        });
     }
 
 
