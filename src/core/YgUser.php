@@ -58,7 +58,7 @@ class YgUser
         $update['headimgurl'] = $data['pic_link']??"";
         $update['wxopenid'] = $data['wx_openid']??"";
         $update['wxunionid'] = $data['wx_unionid']??"";
-        $update['create_time']=$data['create_time']??;
+        $update['create_time']=$data['create_time']??"";
         foreach ($update as $key =>$value){
             if(empty($value)){
               unset($update[$key]);
