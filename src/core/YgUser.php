@@ -33,7 +33,7 @@ class YgUser
         $data['userphone'] =  $phone;
         $data['email'] =  $email;
         $data['password'] =  $password;
-        $data['level'] =  $level;
+        $data['level'] =  self::rank_switch($level);
         $from = self::switch_sourFrom_by_int($from);
         if(self::create_user_source($from,$data)){return ['code'=>1,'msg'=>'账户创建成功'];}else{return ['code'=>0,'msg'=>'账户创建失败'];}
     }
@@ -54,7 +54,7 @@ class YgUser
         $update['equal_id'] = $data['pid']??"";
         $update['sex'] = $data['gender']??"";
         $update['nickname'] = $data['nickname']??"";
-        $update['level'] = $data['al_id']??"";
+        $update['level'] = $data['al_id']?self::rank_switch($data['al_id']):0;
         $update['headimgurl'] = $data['pic_link']??"";
         $update['wxopenid'] = $data['wx_openid']??"";
         $update['wxunionid'] = $data['wx_unionid']??"";
@@ -92,7 +92,7 @@ class YgUser
                 "create_time" => $data['create_time']??0,
                 "update_time" => time(),
                 "equal_id" => $data['equal_id']??0,
-                "level" => $data['level']??0,
+                "level" =>  $data['level']??0,
                 'userphone' => $data['userphone']??"",
                 'email' =>  $data['email']??"",
                 'useraccount'=>$data['useraccount']??"",//用户账户
@@ -178,7 +178,7 @@ class YgUser
             $userInfo['pid'] = $result['equal_id'];
             $userInfo['gender'] = $result['sex'];
             $userInfo['nickname'] = $result['nickname'];
-            $userInfo['al_id'] = $result['level'];
+            $userInfo['al_id'] = self::rank_switch($result['level']) ;
             $userInfo['pic_link'] = $result['headimgurl'];
             $userInfo['wx_openid'] = $result['wxopenid'];
             $userInfo['wx_unionid'] = $result['wxunionid'];
@@ -198,7 +198,7 @@ class YgUser
                 $userList[$key]['pid'] = $value['equal_id'];
                 $userList[$key]['gender'] = $value['sex'];
                 $userList[$key]['nickname'] = $value['nickname'];
-                $userList[$key]['al_id'] = $value['level'];
+                $userList[$key]['al_id'] = self::rank_switch($value['level']);
                 $userList[$key]['pic_link'] = $value['headimgurl'];
                 $userList[$key]['wx_openid'] = $value['wxopenid'];
                 $userList[$key]['wx_unionid'] = $value['wxunionid'];
@@ -404,6 +404,30 @@ class YgUser
                 return 0;
         }
     }
+
+
+    /**
+     * 等级转换
+     * @param int $type
+     * @return int|void
+     */
+  static function rank_switch(int $type){
+      switch ($type){
+          case 1:
+              return 6 ;
+          case 2:
+              return  5 ;
+          case 3:
+              return  4 ;
+          case 4:
+              return 3;
+          case 5:
+              return 2;
+          case 6:
+              return 1;
+      }
+  }
+
 
 
 
