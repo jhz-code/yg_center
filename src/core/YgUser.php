@@ -54,7 +54,7 @@ class YgUser
         $update['equal_id'] = $data['pid']??"";
         $update['sex'] = $data['gender']??"";
         $update['nickname'] = $data['nickname']??"";
-        $update['level'] = $data['al_id']?self::rank_switch($data['al_id']):0;
+        $update['level'] = $data['al_id']?self::get_rank_switch($data['al_id']):0;
         $update['headimgurl'] = $data['pic_link']??"";
         $update['wxopenid'] = $data['wx_openid']??"";
         $update['wxunionid'] = $data['wx_unionid']??"";
@@ -414,19 +414,44 @@ class YgUser
   static function rank_switch(int $type){
       switch ($type){
           case 1:
-              return 6 ;
+              return 60 ;
           case 2:
-              return  5 ;
+              return  50 ;
           case 3:
-              return  4 ;
+              return  40 ;
           case 4:
-              return 3;
+              return 30;
           case 5:
-              return 2;
+              return 20;
           case 6:
-              return 1;
+              return 10;
       }
   }
+
+
+
+    /**
+     * 等级转换
+     * @param int $type
+     * @return int|void
+     */
+    static function get_rank_switch(int $type){
+        switch ($type){
+            case 60:
+                return 1 ;
+            case 50:
+                return  2 ;
+            case 40:
+                return  3 ;
+            case 30:
+                return 4;
+            case 20:
+                return 5;
+            case 10:
+                return 6;
+        }
+    }
+
 
 
 
