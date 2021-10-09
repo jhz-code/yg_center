@@ -74,6 +74,18 @@ class YgUser
     }
 
 
+    /**
+     * 根据编号解绑微信
+     * 解绑微信
+     * @param string $authId
+     * @return UserSourceModel
+     */
+    static function unboundWechat(string $authId)
+    {
+       return  UserSourceModel::where(['auth_id'=>$authId])->update(['wxopenid'=>'','wxunionid'=>'']);
+    }
+
+
 
     /**
      * 创建用户资源
