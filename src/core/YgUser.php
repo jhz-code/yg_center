@@ -54,7 +54,7 @@ class YgUser
         $update['equal_id'] = $data['pid']??"";
         $update['sex'] = $data['gender']??"";
         $update['nickname'] = $data['nickname']??"";
-        $update['level'] = $data['al_id']?self::get_rank_switch($data['al_id']):0;
+        $update['level'] = isset($data['al_id'])?self::get_rank_switch($data['al_id']):0;
         $update['headimgurl'] = $data['pic_link']??"";
         $update['wxopenid'] = $data['wx_openid']??"";
         $update['wxunionid'] = $data['wx_unionid']??"";
