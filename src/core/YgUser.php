@@ -199,7 +199,7 @@ class YgUser
             $userInfo['from_type'] = self::switch_sourceFrom_by_string($result['source_from']);
             return $userInfo;
         }else{
-            $list =  UserSourceModel::where("userphone = '{$account}' or email = '{$account}' or auth_id = '{$account}'  or wxunionid = '{$account}'  or wxopenid = '{$account}' ")->where('ispass = 1')->order('level',"desc")->select();
+            $list =  UserSourceModel::where("userphone = '{$account}' or email = '{$account}' or auth_id = '{$account}'  or wxunionid = '{$account}'  or wxopenid = '{$account}' ")->where('ispass = 1')->order('level',"asc")->select();
             $userList = [];
             foreach ($list as $key=>$value){
                 $userList[$key]['id'] = $value['id'];
@@ -317,7 +317,9 @@ class YgUser
      */
     static function getUserLevel(string $mobile){
         //查询当前用户是否是经销商
-        return UserSourceModel::where(['userphone'=>$mobile])->field('level,source_from')->order('level','asc')->select()[0];
+        $userSource = UserSourceModel::where(['userphone'=>$mobile])->field('level,source_from')->order('level','asc')->select()[0];
+        $userSource['leve'] = self::rank_switch($userSource['leve']);
+        return  $userSource;
     }
 
 
