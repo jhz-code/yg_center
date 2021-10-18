@@ -195,6 +195,9 @@ class YgUser
             $userInfo['wx_openid'] = $result['wxopenid'];
             $userInfo['wx_unionid'] = $result['wxunionid'];
             $userInfo['create_time'] = $result['create_time'];
+            $userInfo['birthday'] = strtotime($result['birthday']);
+            $userInfo['idcard_type'] = $result['idcard_type'];
+            $userInfo['idcard_num'] = $result['idcard_num'];
             $userInfo['password'] = self::getUserPassword($account);
             $userInfo['from_type'] = self::switch_sourceFrom_by_string($result['source_from']);
             return $userInfo;
@@ -214,7 +217,10 @@ class YgUser
                 $userList[$key]['pic_link'] = $value['headimgurl'];
                 $userList[$key]['wx_openid'] = $value['wxopenid'];
                 $userList[$key]['wx_unionid'] = $value['wxunionid'];
-                $userList[$key]['create_time'] = $value['create_time'];;
+                $userList[$key]['create_time'] = $value['create_time'];
+                $userList[$key]['birthday'] = strtotime($value['birthday']);
+                $userList[$key]['idcard_type'] = $value['idcard_type'];
+                $userList[$key]['idcard_num'] = $value['idcard_num'];
                 $userList[$key]['password'] = self::getUserPassword($account);
                 $userList[$key]['from_type'] = self::switch_sourceFrom_by_string($value['source_from']);
             }
